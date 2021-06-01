@@ -102,7 +102,7 @@ double gamma_cdf(double x, double shape, double rate)
 
 double inverse_gamma(double shape, double scale)
 {
-    return 1/gamma(shape, scale);
+    return 1 / gamma(shape, scale);
 }
 
 double inverse_gamma_pdf(double x, double shape, double scale)

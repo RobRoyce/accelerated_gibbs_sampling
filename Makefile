@@ -1,38 +1,46 @@
-CC=gcc
-CFLAGS=--std=c99 -Wall -Wpedantic -lm
+CC=nvcc
+CFLAGS=-lm -lcudadevrt -rdc=true
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test 
-MODULES := distrs utils gmm gmm_gibbs
+MODULES := distrs utils gmm gmm_gibbs main
+
+.PHONY : clean test
 
 all: $(INIT) $(MODULES) $(TESTS)
 
 init:
 	mkdir -p obj bin
 
-distrs: src/distrs.c src/distrs.h
+main: main.cu
+	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+
+distrs: src/distrs.cu src/distrs.h
 	$(CC) -c $(CFLAGS) $< -o obj/$@.o
 
-utils: src/utils.c src/utils.h
+utils: src/utils.cu src/utils.h
 	$(CC) -c $(CFLAGS) $< -o obj/$@.o
 
-gmm: src/gmm.c src/gmm.h
+gmm: src/gmm.cu src/gmm.h
 	$(CC) -c $(CFLAGS) $< -o obj/$@.o
 
-gmm_gibbs: src/gmm_gibbs.c src/gmm.h
+gmm_gibbs: src/gmm_gibbs.cu src/gmm.h
 	$(CC) -c $(CFLAGS) $< -o obj/$@.o
 
-cont_pdf_test: test/cont_pdf_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
+cont_pdf_test: test/cont_pdf_test.cu
+	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+	#./bin/$@
 
-cont_gof_test: test/cont_gof_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
+cont_gof_test: test/cont_gof_test.cu
+	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+	#./bin/$@
 
-int_test: test/int_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
+int_test: test/int_test.cu
+	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+	#./bin/$@
 
 clean:
 	rm -rf bin
 	rm -rf obj
+
+test:
+	cd bin && ./cont_gof_test && ./int_test && ./cont_pdf_test

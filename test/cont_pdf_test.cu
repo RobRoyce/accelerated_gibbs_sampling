@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "../src/distrs.h"
 
 #define EPS 1e-5
+
+int DEBUG = 0;
 
 int test_fn(double *x, double *y, size_t n, double (*f)(double x), char *name)
 {
@@ -180,8 +182,9 @@ double f_17(double x) {
     return inverse_gamma_cdf(x, 1.25, 2);
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
     return !(test_fn(x_0, y_0, n_0, f_0, name_0) &&
               test_fn(x_1, y_1, n_1, f_1, name_1) &&
               test_fn(x_2, y_2, n_2, f_2, name_2) &&

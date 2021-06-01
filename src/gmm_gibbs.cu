@@ -5,6 +5,9 @@
 #include "gmm.h"
 #include "utils.h"
 #include "distrs.h"
+#include "cuda.h"
+
+__device__ struct gmm_gibbs_state *d_state;
 
 struct gmm_sufficient_statistic {
     // `ns[i] = m` means m data points are assigned to the i-th component
@@ -35,7 +38,7 @@ struct gmm_gibbs_state *
 alloc_gmm_gibbs_state(size_t n, size_t k, double *data, struct gmm_prior prior,
                       struct gmm_params *params)
 {
-    struct gmm_gibbs_state *s = abort_malloc(sizeof(struct gmm_gibbs_state));
+    struct gmm_gibbs_state *s = (struct gmm_gibbs_state *)abort_malloc(sizeof(struct gmm_gibbs_state));
     s->n = n;
     s->k = k;
     s->data = data;
@@ -60,9 +63,20 @@ void free_gmm_gibbs_state(struct gmm_gibbs_state *state)
 
 void clear_sufficient_statistic(struct gmm_gibbs_state *state)
 {
-    memset(state->ss->ns, 0, state->k * sizeof(unsigned int));
-    memset(state->ss->comp_sums, 0, state->k * sizeof(double));
-    memset(state->ss->comp_sqsums, 0, state->k * sizeof(double));
+    cudaMemset(state->ss->ns, 0, state->k * sizeof(unsigned int));
+    cudaMemset(state->ss->comp_sums, 0, state->k * sizeof(double));
+    cudaMemset(state->ss->comp_sqsums, 0, state->k * sizeof(double));
+}
+
+__global__ void update_sufficient_statistic_cuda(struct gmm_gibbs_state *state)
+{
+    printf("Ok...\n");
+    int i = threadIdx.x;
+    double x = state->data[i];
+    unsigned int z = state->params->zs[i];
+    state->ss->ns[z]++;
+    state->ss->comp_sums[z] += x;
+    state->ss->comp_sqsums[z] += x*x;
 }
 
 void update_sufficient_statistic(struct gmm_gibbs_state *state)
@@ -129,8 +143,22 @@ void update_zs(struct gmm_gibbs_state *state)
 
 void gibbs(struct gmm_gibbs_state *state, size_t iters)
 {
+    int numBlocks = 1;
+    dim3 threadsPerBlock(3);
+
     while(iters--) {
-        update_sufficient_statistic(state);
+        printf("Clearing sufficient statistic...\n");
+        clear_sufficient_statistic(state);
+
+        struct gmm_gibbs_state *gibbs_state_d;
+        cudaMalloc((void**)&gibbs_state_d, sizeof(struct gmm_gibbs_state*));
+        cudaMemcpy(state, gibbs_state_d, sizeof(struct gmm_gibbs_state *), cudaMemcpyHostToDevice);
+
+        printf("Updating sufficient statistic...\n");
+        update_sufficient_statistic_cuda<<<numBlocks, threadsPerBlock>>>(gibbs_state_d);
+
+        cudaMemcpy(gibbs_state_d, state, sizeof(struct gmm_gibbs_state *), cudaMemcpyDeviceToHost);
+
         update_ws(state);
         update_means(state);
         update_vars(state);
