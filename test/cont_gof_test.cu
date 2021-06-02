@@ -18,7 +18,6 @@
 #define N 100000
 
 double sample[N];
-int DEBUG = 0;
 
 int double_comp(const void *a, const void *b) {
     return *((double *) a) - *((double *) b) < 0 ? -1 : 1;
@@ -31,11 +30,8 @@ int cramer_von_mises(double (*sampler)(), double (*cdf)(double), std::string nam
     for (size_t i = 1; i <= N; i++)
         statistic += square(cdf(sample[i - 1]) - (2.0 * i - 1) / 2 / N);
     int success = statistic < CRITICAL_VAL ? 1 : 0;
-
-    if (DEBUG) {
-        printf("%s %s Cramer-von Mises (statistic=%f).\n", name.c_str(),
-               success ? "passed" : "failed", statistic);
-    }
+    printf("%s %s Cramer-von Mises (statistic=%f).\n", name.c_str(),
+           success ? "passed" : "failed", statistic);
 
     return success;
 }
@@ -69,7 +65,6 @@ double sampler_7() { return inverse_gamma(1.25, 2); }
 double cdf_7(double x) { return inverse_gamma_cdf(x, 1.25, 2); }
 
 int main(int argc, char **argv) {
-    DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
 
     srand(time(NULL));
     if (!(cramer_von_mises(sampler_1, cdf_1, "uniform(0, 1)") &&
@@ -79,9 +74,9 @@ int main(int argc, char **argv) {
           cramer_von_mises(sampler_5, cdf_5, "gamma(1.25, 2)") &&
           cramer_von_mises(sampler_6, cdf_6, "inverse_gamma(1, 1)") &&
           cramer_von_mises(sampler_7, cdf_7, "inverse_gamma(1.25, 2)"))) {
-        printf("cont_gof_test: Success!\n");
-        return 0;
+        printf("cont_gof_test ----------------------------------- FAILED!\n");
     } else {
-        printf("cont_gof_test: FAILED!\n");
+        printf("cont_gof_test ----------------------------------- SUCCESS!\n");
     }
+    return 0;
 }

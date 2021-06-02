@@ -5,8 +5,6 @@
 
 #define EPS 1e-5
 
-int DEBUG = 0;
-
 int test_fn(double *x, double *y, size_t n, double (*f)(double x), char *name)
 {
     for(int i=0; i < n; i++) {
@@ -184,8 +182,7 @@ double f_17(double x) {
 
 int main(int argc, char **argv)
 {
-    DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
-    return !(test_fn(x_0, y_0, n_0, f_0, name_0) &&
+    int res = !(test_fn(x_0, y_0, n_0, f_0, name_0) &&
               test_fn(x_1, y_1, n_1, f_1, name_1) &&
               test_fn(x_2, y_2, n_2, f_2, name_2) &&
               test_fn(x_3, y_3, n_3, f_3, name_3) &&
@@ -203,4 +200,10 @@ int main(int argc, char **argv)
               test_fn(x_15, y_15, n_15, f_15, name_15) &&
               test_fn(x_16, y_16, n_16, f_16, name_16) &&
               test_fn(x_17, y_17, n_17, f_17, name_17));
+
+    if (res != 0)
+        printf("cont_gof_test ----------------------------------- FAILED!\n");
+    else
+        printf("cont_gof_test ----------------------------------- SUCCESS!\n");
+    return 0;
 }

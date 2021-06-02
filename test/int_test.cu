@@ -6,6 +6,7 @@
 #include "../src/utils.h"
 #include "../src/gpu.h"
 
+int DEBUG = 1;
 
 double DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
                  30.4, -18.44, 10.91, 11.89, -20.64, 30.59, 14.84, 13.54, 7.25, 12.83,
@@ -19,11 +20,11 @@ double DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
                  -19.78, -17.2, 11.79, 29.95, 7.29, 6.57, -17.99, 13.29, -22.53, -20.0};
 
 
-//const unsigned int ZS[] = {1, 2, 2, 2, 2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1,
-//    1, 1, 2, 2, 0, 0, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 0, 0, 1, 0, 1, 2, 2, 0, 0,
-//    1, 0, 1, 2, 0, 1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0, 2, 0, 1, 1, 0, 1, 1, 0, 1,
-//    1, 0, 1, 2, 0, 1, 1, 0, 1, 2, 2, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 0, 0, 0,
-//    1, 2, 1, 1, 0, 1, 0, 0};
+const unsigned int ZS[] = {1, 2, 2, 2, 2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1,
+                           1, 1, 2, 2, 0, 0, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 0, 0, 1, 0, 1, 2, 2, 0, 0,
+                           1, 0, 1, 2, 0, 1, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0, 2, 0, 1, 1, 0, 1, 1, 0, 1,
+                           1, 0, 1, 2, 0, 1, 1, 0, 1, 2, 2, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 0, 0, 0,
+                           1, 2, 1, 1, 0, 1, 0, 0};
 
 const int N = sizeof(DATA) / sizeof(double);
 const int K = 3;
@@ -34,6 +35,24 @@ const struct gmm_prior PRIOR = {.dirichlet_prior=5.0,
         .means_var_prior=100.0,
         .vars_shape_prior=2.0,
         .vars_scale_prior=10.0};
+
+void verify(struct gmm_params *params) {
+    int c1, c2, c3, err = 0;
+    c1 = params->zs[0];
+    c2 = params->zs[1];
+    c3 = params->zs[N - 1];
+
+    for (int i = 0; i < N; i++) {
+        if ((ZS[i] == 1 && params->zs[i] != c1) || (ZS[i] == 2 && params->zs[i] != c2) ||
+            (ZS[i] == 0 && params->zs[i] != c3)) {
+            err = 1;
+        }
+    }
+    if (err != 0)
+        printf("int_test ---------------------------------------- FAILED! \n");
+    else
+        printf("int_test ---------------------------------------- SUCCESS! \n");
+}
 
 void print_params(struct gmm_params *params) {
     printf("%d\n", K);
@@ -48,20 +67,18 @@ void print_params(struct gmm_params *params) {
     putchar('\n');
 }
 
-int main() {
-    double weights[K], means[K], vars[K];
-    unsigned int zs[N];
+int main(int argc, char **argv) {
+    DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
+
     struct gmm_gibbs_state *gibbs_state;
-    // struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
     struct gmm_params *params;
-    gpuErrchk(cudaMallocManaged(&params, sizeof(struct gmm_params)));
-    gpuErrchk(cudaMallocManaged(&(params->weights), K*sizeof(double)));
-    gpuErrchk(cudaMallocManaged(&(params->means), K*sizeof(double)));
-    gpuErrchk(cudaMallocManaged(&(params->vars), K*sizeof(double)));
-    gpuErrchk(cudaMallocManaged(&(params->zs), K*sizeof(unsigned int)));
-
-
     double *data_managed;
+
+    gpuErrchk(cudaMallocManaged(&params, sizeof(struct gmm_params)));
+    gpuErrchk(cudaMallocManaged(&(params->weights), K * sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->means), K * sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->vars), K * sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->zs), K * sizeof(unsigned int)));
     gpuErrchk(cudaMallocManaged(&data_managed, sizeof(DATA)));
     gpuErrchk(cudaMemcpy(data_managed, DATA, sizeof(DATA), cudaMemcpyDefault));
 
@@ -72,7 +89,7 @@ int main() {
     gibbs(gibbs_state, ITERS);
 
     free_gmm_gibbs_state(gibbs_state);
-    print_params(params);
-
+//    print_params(params);
+    verify(params);
     return 0;
 }
