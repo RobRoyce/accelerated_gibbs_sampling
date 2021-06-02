@@ -5,6 +5,7 @@
 #include "gmm.h"
 #include "utils.h"
 #include "distrs.h"
+#include "gpu.h"
 #include "cuda.h"
 
 __device__ struct gmm_gibbs_state *d_state;
@@ -47,45 +48,40 @@ alloc_gmm_gibbs_state(size_t n, size_t k, double *data, struct gmm_prior prior,
     s->prior = prior;
     s->params = params;
 
-    cudaMallocManaged(&(s->ss), sizeof(struct gmm_sufficient_statistic));
-    cudaMallocManaged(&(s->ss->ns), k*sizeof(unsigned int));
-    cudaMallocManaged(&(s->ss->comp_sums), k*sizeof(double));
-    cudaMallocManaged(&(s->ss->comp_sqsums), k*sizeof(double));
+    gpuErrchk(cudaMallocManaged(&(s->ss), sizeof(struct gmm_sufficient_statistic)));
+    gpuErrchk(cudaMallocManaged(&(s->ss->ns), k*sizeof(unsigned int)));
+    gpuErrchk(cudaMallocManaged(&(s->ss->comp_sums), k*sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(s->ss->comp_sqsums), k*sizeof(double)));
 
     // cudaMemset(s->ss, 0, sizeof(struct gmm_sufficient_statistic));
-    cudaMemset(s->ss->ns, 0, k*sizeof(unsigned int));
-    cudaMemset(s->ss->comp_sums, 0, k*sizeof(double));
-    cudaMemset(s->ss->comp_sqsums, 0, k*sizeof(double));
+    gpuErrchk(cudaMemset(s->ss->ns, 0, k*sizeof(unsigned int)));
+    gpuErrchk(cudaMemset(s->ss->comp_sums, 0, k*sizeof(double)));
+    gpuErrchk(cudaMemset(s->ss->comp_sqsums, 0, k*sizeof(double)));
 
     return s;
 }
 
 void free_gmm_gibbs_state(struct gmm_gibbs_state *state)
 {
-    cudaFree(state->ss->ns);
-    cudaFree(state->ss->comp_sums);
-    cudaFree(state->ss->comp_sqsums);
-    cudaFree(state->ss);
-    cudaFree(state);
+    gpuErrchk(cudaFree(state->ss->ns));
+    gpuErrchk(cudaFree(state->ss->comp_sums));
+    gpuErrchk(cudaFree(state->ss->comp_sqsums));
+    gpuErrchk(cudaFree(state->ss));
+    gpuErrchk(cudaFree(state));
 }
 
 void clear_sufficient_statistic(struct gmm_gibbs_state *state)
 {
-    cudaMemset(state->ss->ns, 0, state->k * sizeof(unsigned int));
-    cudaMemset(state->ss->comp_sums, 0, state->k * sizeof(double));
-    cudaMemset(state->ss->comp_sqsums, 0, state->k * sizeof(double));
+    gpuErrchk(cudaMemset(state->ss->ns, 0, state->k * sizeof(unsigned int)));
+    gpuErrchk(cudaMemset(state->ss->comp_sums, 0, state->k * sizeof(double)));
+    gpuErrchk(cudaMemset(state->ss->comp_sqsums, 0, state->k * sizeof(double)));
 }
 
 __global__ void update_sufficient_statistic_cuda(struct gmm_gibbs_state *state)
 {
-    // printf("Ok...\n");
     int i = threadIdx.x;
     double x = state->data[i];
     unsigned int z = state->params->zs[i];
-
-    // state->ss->ns[z]++;
-    // state->ss->comp_sums[z] += x;
-    // state->ss->comp_sqsums[z] += x*x;
     atomicAdd(&(state->ss->ns[z]), 1);
     atomicAdd(&(state->ss->comp_sums[z]), x);
     atomicAdd(&(state->ss->comp_sqsums[z]), x*x);
@@ -108,12 +104,12 @@ void update_ws(struct gmm_gibbs_state *state)
 {
     // double dirichlet_param[state->k];
     double *dirichlet_param;
-    cudaMallocManaged(&dirichlet_param, state->k * sizeof(double));
+    gpuErrchk(cudaMallocManaged(&dirichlet_param, state->k * sizeof(double)));
 
     vec_add_ud(dirichlet_param, state->ss->ns, state->params->weights, state->k);
     dirichlet(state->params->weights, dirichlet_param, state->k);
 
-    cudaFree(dirichlet_param);
+    gpuErrchk(cudaFree(dirichlet_param));
 }
 
 void update_means(struct gmm_gibbs_state *state)
@@ -167,7 +163,7 @@ void gibbs(struct gmm_gibbs_state *state, size_t iters)
 
         clear_sufficient_statistic(state);
         update_sufficient_statistic_cuda<<<numBlocks, threadsPerBlock>>>(state);
-        cudaDeviceSynchronize();
+        gpuErrchk(cudaDeviceSynchronize());
 
         update_ws(state);
         update_means(state);
