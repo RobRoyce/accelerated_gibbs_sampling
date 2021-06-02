@@ -50,15 +50,26 @@ int main() {
     double weights[K], means[K], vars[K];
     unsigned int zs[N];
     struct gmm_gibbs_state *gibbs_state;
-    struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
-    srand(time(NULL));
-    rand_init_gmm_params(&params, N, K, PRIOR);
+    // struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
+    struct gmm_params *params;
+    cudaMallocManaged(&params, sizeof(struct gmm_params));
+    cudaMallocManaged(&(params->weights), K*sizeof(double));
+    cudaMallocManaged(&(params->means), K*sizeof(double));
+    cudaMallocManaged(&(params->vars), K*sizeof(double));
+    cudaMallocManaged(&(params->zs), K*sizeof(unsigned int));
 
-    gibbs_state = alloc_gmm_gibbs_state(N, K, DATA, PRIOR, &params);
+    double *data_managed;
+    cudaMallocManaged(&data_managed, sizeof(DATA));
+    cudaMemcpy(data_managed, DATA, sizeof(DATA), cudaMemcpyDefault);
+
+    srand(time(NULL));
+    rand_init_gmm_params(params, N, K, PRIOR);
+
+    gibbs_state = alloc_gmm_gibbs_state(N, K, data_managed, PRIOR, params);
     gibbs(gibbs_state, ITERS);
 
     free_gmm_gibbs_state(gibbs_state);
-    print_params(&params);
+    print_params(params);
 
     return 0;
 }
