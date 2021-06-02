@@ -4,6 +4,7 @@
 
 #include "../src/gmm.h"
 #include "../src/utils.h"
+#include "../src/gpu.h"
 
 
 double DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
@@ -16,6 +17,7 @@ double DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
                  -22.4, 6.58, 29.8, -17.43, 7.8, 9.72, -21.53, 11.76, 29.72, 29.31, 6.82,
                  15.51, 10.69, 29.56, 8.84, 30.93, 28.75, 10.72, 9.21, 8.57, 11.92, -23.96,
                  -19.78, -17.2, 11.79, 29.95, 7.29, 6.57, -17.99, 13.29, -22.53, -20.0};
+
 
 //const unsigned int ZS[] = {1, 2, 2, 2, 2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1,
 //    1, 1, 2, 2, 0, 0, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 0, 0, 1, 0, 1, 2, 2, 0, 0,
@@ -52,15 +54,16 @@ int main() {
     struct gmm_gibbs_state *gibbs_state;
     // struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
     struct gmm_params *params;
-    cudaMallocManaged(&params, sizeof(struct gmm_params));
-    cudaMallocManaged(&(params->weights), K*sizeof(double));
-    cudaMallocManaged(&(params->means), K*sizeof(double));
-    cudaMallocManaged(&(params->vars), K*sizeof(double));
-    cudaMallocManaged(&(params->zs), K*sizeof(unsigned int));
+    gpuErrchk(cudaMallocManaged(&params, sizeof(struct gmm_params)));
+    gpuErrchk(cudaMallocManaged(&(params->weights), K*sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->means), K*sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->vars), K*sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->zs), K*sizeof(unsigned int)));
+
 
     double *data_managed;
-    cudaMallocManaged(&data_managed, sizeof(DATA));
-    cudaMemcpy(data_managed, DATA, sizeof(DATA), cudaMemcpyDefault);
+    gpuErrchk(cudaMallocManaged(&data_managed, sizeof(DATA)));
+    gpuErrchk(cudaMemcpy(data_managed, DATA, sizeof(DATA), cudaMemcpyDefault));
 
     srand(time(NULL));
     rand_init_gmm_params(params, N, K, PRIOR);
