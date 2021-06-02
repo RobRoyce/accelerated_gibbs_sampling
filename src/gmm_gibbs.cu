@@ -38,27 +38,35 @@ struct gmm_gibbs_state *
 alloc_gmm_gibbs_state(size_t n, size_t k, double *data, struct gmm_prior prior,
                       struct gmm_params *params)
 {
-    struct gmm_gibbs_state *s = (struct gmm_gibbs_state *)abort_malloc(sizeof(struct gmm_gibbs_state));
+    struct gmm_gibbs_state *s;
+    cudaMallocManaged(&s, sizeof(struct gmm_gibbs_state));
+    
     s->n = n;
     s->k = k;
     s->data = data;
     s->prior = prior;
     s->params = params;
-    s->ss = (struct gmm_sufficient_statistic*)
-        abort_malloc(sizeof(struct gmm_sufficient_statistic));
-    s->ss->ns = (unsigned *) abort_calloc(k, sizeof(unsigned int));
-    s->ss->comp_sums = (double *) abort_calloc(k, sizeof(double));
-    s->ss->comp_sqsums = (double *) abort_calloc(k, sizeof(double));
+
+    cudaMallocManaged(&(s->ss), sizeof(struct gmm_sufficient_statistic));
+    cudaMallocManaged(&(s->ss->ns), k*sizeof(unsigned int));
+    cudaMallocManaged(&(s->ss->comp_sums), k*sizeof(double));
+    cudaMallocManaged(&(s->ss->comp_sqsums), k*sizeof(double));
+
+    // cudaMemset(s->ss, 0, sizeof(struct gmm_sufficient_statistic));
+    cudaMemset(s->ss->ns, 0, k*sizeof(unsigned int));
+    cudaMemset(s->ss->comp_sums, 0, k*sizeof(double));
+    cudaMemset(s->ss->comp_sqsums, 0, k*sizeof(double));
+
     return s;
 }
 
 void free_gmm_gibbs_state(struct gmm_gibbs_state *state)
 {
-    free(state->ss->ns);
-    free(state->ss->comp_sums);
-    free(state->ss->comp_sqsums);
-    free(state->ss);
-    free(state);
+    cudaFree(state->ss->ns);
+    cudaFree(state->ss->comp_sums);
+    cudaFree(state->ss->comp_sqsums);
+    cudaFree(state->ss);
+    cudaFree(state);
 }
 
 void clear_sufficient_statistic(struct gmm_gibbs_state *state)
@@ -70,13 +78,17 @@ void clear_sufficient_statistic(struct gmm_gibbs_state *state)
 
 __global__ void update_sufficient_statistic_cuda(struct gmm_gibbs_state *state)
 {
-    printf("Ok...\n");
+    // printf("Ok...\n");
     int i = threadIdx.x;
     double x = state->data[i];
     unsigned int z = state->params->zs[i];
-    state->ss->ns[z]++;
-    state->ss->comp_sums[z] += x;
-    state->ss->comp_sqsums[z] += x*x;
+
+    // state->ss->ns[z]++;
+    // state->ss->comp_sums[z] += x;
+    // state->ss->comp_sqsums[z] += x*x;
+    atomicAdd(&(state->ss->ns[z]), 1);
+    atomicAdd(&(state->ss->comp_sums[z]), x);
+    atomicAdd(&(state->ss->comp_sqsums[z]), x*x);
 }
 
 void update_sufficient_statistic(struct gmm_gibbs_state *state)
@@ -94,9 +106,14 @@ void update_sufficient_statistic(struct gmm_gibbs_state *state)
 
 void update_ws(struct gmm_gibbs_state *state)
 {
-    double dirichlet_param[state->k];
+    // double dirichlet_param[state->k];
+    double *dirichlet_param;
+    cudaMallocManaged(&dirichlet_param, state->k * sizeof(double));
+
     vec_add_ud(dirichlet_param, state->ss->ns, state->params->weights, state->k);
     dirichlet(state->params->weights, dirichlet_param, state->k);
+
+    cudaFree(dirichlet_param);
 }
 
 void update_means(struct gmm_gibbs_state *state)
@@ -144,20 +161,13 @@ void update_zs(struct gmm_gibbs_state *state)
 void gibbs(struct gmm_gibbs_state *state, size_t iters)
 {
     int numBlocks = 1;
-    dim3 threadsPerBlock(3);
+    dim3 threadsPerBlock(state->n);
 
     while(iters--) {
-        printf("Clearing sufficient statistic...\n");
+
         clear_sufficient_statistic(state);
-
-        struct gmm_gibbs_state *gibbs_state_d;
-        cudaMalloc((void**)&gibbs_state_d, sizeof(struct gmm_gibbs_state*));
-        cudaMemcpy(state, gibbs_state_d, sizeof(struct gmm_gibbs_state *), cudaMemcpyHostToDevice);
-
-        printf("Updating sufficient statistic...\n");
-        update_sufficient_statistic_cuda<<<numBlocks, threadsPerBlock>>>(gibbs_state_d);
-
-        cudaMemcpy(gibbs_state_d, state, sizeof(struct gmm_gibbs_state *), cudaMemcpyDeviceToHost);
+        update_sufficient_statistic_cuda<<<numBlocks, threadsPerBlock>>>(state);
+        cudaDeviceSynchronize();
 
         update_ws(state);
         update_means(state);
