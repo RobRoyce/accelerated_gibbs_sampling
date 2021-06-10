@@ -2,19 +2,21 @@
 
 #include <math.h>
 
+typedef float DTYPE;
+
 // add `u` and `v` of length `k` and store the result in `dst`
-void vec_add_dd(double *dst, double *u, double *v, size_t k);
-void vec_add_ud(double *dst, unsigned int *u, double *v, size_t k);
+void vec_add_dd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k);
+void vec_add_ud(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k);
 
-void normalize(double *v, size_t n);
+void normalize(DTYPE *v, size_t n);
 
-double square(double x);
+DTYPE square(DTYPE x);
 
-double ligamma(double s, double x);
+DTYPE ligamma(DTYPE s, DTYPE x);
 
-extern double uigamma(double s, double x);
+extern DTYPE uigamma(DTYPE s, DTYPE x);
 
-double beta(double *x, size_t n);
+DTYPE beta(DTYPE *x, size_t n);
 
 // try to malloc/calloc and abort if unsuccessful
 void *abort_calloc(size_t nmemb, size_t size);

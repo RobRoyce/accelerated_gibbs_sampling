@@ -8,7 +8,7 @@
 
 int DEBUG = 1;
 
-double DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
+DTYPE DATA[] = {11.26, 28.93, 30.52, 30.09, 29.46, 10.03, 11.24, 11.55,
                  30.4, -18.44, 10.91, 11.89, -20.64, 30.59, 14.84, 13.54, 7.25, 12.83,
                  11.86, 29.95, 29.47, -18.16, -19.28, -18.87, 9.95, 28.24, 9.43, 7.38,
                  29.46, 30.73, 7.75, 28.29, -21.99, -20.0, -20.86, 15.5, -18.62, 13.11,
@@ -26,7 +26,7 @@ const unsigned int ZS[] = {1, 2, 2, 2, 2, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 1, 1,
                            1, 0, 1, 2, 0, 1, 1, 0, 1, 2, 2, 1, 1, 1, 2, 1, 2, 2, 1, 1, 1, 1, 0, 0, 0,
                            1, 2, 1, 1, 0, 1, 0, 0};
 
-const int N = sizeof(DATA) / sizeof(double);
+const int N = sizeof(DATA) / sizeof(DTYPE);
 const int K = 3;
 const int ITERS = 500;
 
@@ -72,12 +72,12 @@ int main(int argc, char **argv) {
 
     struct gmm_gibbs_state *gibbs_state;
     struct gmm_params *params;
-    double *data_managed;
+    DTYPE *data_managed;
 
     gpuErrchk(cudaMallocManaged(&params, sizeof(struct gmm_params)));
-    gpuErrchk(cudaMallocManaged(&(params->weights), K * sizeof(double)));
-    gpuErrchk(cudaMallocManaged(&(params->means), K * sizeof(double)));
-    gpuErrchk(cudaMallocManaged(&(params->vars), K * sizeof(double)));
+    gpuErrchk(cudaMallocManaged(&(params->weights), K * sizeof(DTYPE)));
+    gpuErrchk(cudaMallocManaged(&(params->means), K * sizeof(DTYPE)));
+    gpuErrchk(cudaMallocManaged(&(params->vars), K * sizeof(DTYPE)));
     gpuErrchk(cudaMallocManaged(&(params->zs), K * sizeof(unsigned int)));
     gpuErrchk(cudaMallocManaged(&data_managed, sizeof(DATA)));
     gpuErrchk(cudaMemcpy(data_managed, DATA, sizeof(DATA), cudaMemcpyDefault));
