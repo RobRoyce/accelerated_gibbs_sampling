@@ -19,8 +19,8 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
 void verify(struct gmm_params *params, unsigned *zs, size_t n);
 
 int DEBUG = 1;
-const int N = 8192;
-const int K = 4;
+const int N = 8192 << 3;
+const int K = 32;
 const int ITERS = 500;
 
 const struct gmm_prior PRIOR = {
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
     const unsigned DATA_MEM_SIZE = N * sizeof(DTYPE);
     unsigned int zs[N];
-    DTYPE weights[K], means[K], vars[K], *dataManaged = malloc(DATA_MEM_SIZE);;
+    DTYPE weights[K], means[K], vars[K], *dataManaged = malloc(DATA_MEM_SIZE);
     struct gmm_gibbs_state *gibbs_state;
     struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
 
