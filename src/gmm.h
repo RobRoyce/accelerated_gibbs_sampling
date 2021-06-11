@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stddef.h>
-#include "utils.h"
+#include "distrs.h"
 
 struct gmm_prior {
     // symmetric Dirichlet prior on component weights

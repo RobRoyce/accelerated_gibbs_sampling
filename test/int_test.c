@@ -1,8 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "string.h"
 #include "../src/gmm.h"
+
+static uint64_t usec;
+static __inline__ uint64_t gettime(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (((uint64_t) tv.tv_sec) * 1000000 + ((uint64_t) tv.tv_usec));
+}
+__attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
+__attribute__ ((noinline))  void end_roi() {
+    usec = (gettime() - usec);
+    printf("elapsed (sec): %f\n", usec / 1000000.0);
+}
 
 void printParams(struct gmm_params *params, DTYPE *data, size_t n, size_t k);
 
@@ -38,7 +46,9 @@ int main(int argc, char **argv) {
     gibbs_state = alloc_gmm_gibbs_state(N, K, dataManaged, PRIOR, &params);
     printParams(&params, dataManaged, N, K);
 
+    begin_roi();
     gibbs(gibbs_state, ITERS);
+    end_roi();
 
     free_gmm_gibbs_state(gibbs_state);
     printParams(&params, dataManaged, N, K);

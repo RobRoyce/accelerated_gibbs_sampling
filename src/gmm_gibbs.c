@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "gmm.h"
-#include "distrs.h"
 
 struct gmm_sufficient_statistic {
     // `ns[i] = m` means m data points are assigned to the i-th component
@@ -34,17 +29,17 @@ struct gmm_gibbs_state *
 alloc_gmm_gibbs_state(size_t n, size_t k, DTYPE *data, struct gmm_prior prior,
                       struct gmm_params *params)
 {
-    struct gmm_gibbs_state *s = abort_malloc(sizeof(struct gmm_gibbs_state));
+    struct gmm_gibbs_state *s = abortMalloc(sizeof(struct gmm_gibbs_state));
     s->n = n;
     s->k = k;
     s->data = data;
     s->prior = prior;
     s->params = params;
     s->ss = (struct gmm_sufficient_statistic*)
-        abort_malloc(sizeof(struct gmm_sufficient_statistic));
-    s->ss->ns = (unsigned *) abort_calloc(k, sizeof(unsigned int));
-    s->ss->comp_sums = (DTYPE *) abort_calloc(k, sizeof(DTYPE));
-    s->ss->comp_sqsums = (DTYPE *) abort_calloc(k, sizeof(DTYPE));
+        abortMalloc(sizeof(struct gmm_sufficient_statistic));
+    s->ss->ns = (unsigned *) abortCalloc(k, sizeof(unsigned int));
+    s->ss->comp_sums = (DTYPE *) abortCalloc(k, sizeof(DTYPE));
+    s->ss->comp_sqsums = (DTYPE *) abortCalloc(k, sizeof(DTYPE));
     return s;
 }
 
@@ -80,7 +75,7 @@ void update_sufficient_statistic(struct gmm_gibbs_state *state)
 void update_ws(struct gmm_gibbs_state *state)
 {
     DTYPE dirichlet_param[state->k];
-    vec_add_ud(dirichlet_param, state->ss->ns, state->params->weights, state->k);
+    vecAddUd(dirichlet_param, state->ss->ns, state->params->weights, state->k);
     dirichlet(state->params->weights, dirichlet_param, state->k);
 }
 

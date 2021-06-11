@@ -1,5 +1,5 @@
 CC=gcc -pg
-CFLAGS=--std=c99 -Wall -Wpedantic -lm
+CFLAGS=--std=c99 -Wall -Wpedantic -lm -O1
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test 
 MODULES := distrs utils gmm gmm_gibbs

@@ -2,14 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "distrs.h"
-#include "utils.h"
 #include "gmm.h"
 
 void alloc_dirichlet_param(DTYPE **dirichlet_param, DTYPE param, size_t k)
 {
     
-    *dirichlet_param = (DTYPE *) abort_calloc(k, sizeof(DTYPE));
+    *dirichlet_param = (DTYPE *) abortCalloc(k, sizeof(DTYPE));
     while(k--)
         (*dirichlet_param)[k] = param;
 }

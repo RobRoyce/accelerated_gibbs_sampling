@@ -73,7 +73,7 @@ DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var)
 DTYPE gamma(DTYPE shape, DTYPE rate)
 {
     int n = floor(shape);
-    DTYPE delta = shape - n, exp_part = 0,  xi, eta;
+    DTYPE delta = shape - n, exp_part = 0,  xi = 0, eta = 0;
     while(n--)
         exp_part += -log(uniform(0, 1));
     if(delta > DBL_EPSILON) do {

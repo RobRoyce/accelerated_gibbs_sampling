@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
-
 #include "../src/distrs.h"
-#include "../src/utils.h"
 
 /*
  * Critical value of the distribution of the test statistic in the Cramer-von
