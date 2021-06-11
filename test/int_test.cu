@@ -12,9 +12,10 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
 void verify(struct GMMParams *params, unsigned *zs, size_t n);
 
 int DEBUG = 1;
-const int N = 1024;
-const int K = 3;
+const int N = 8192;
+const int K = 64;
 const int ITERS = 500;
+
 const struct GMMPrior PRIOR = {
         .dirichletPrior=5.0,
         .meansMeanPrior=0.0,
@@ -46,7 +47,6 @@ int main(int argc, char **argv) {
     randomInit(dataManaged, h_zs, N, K);
     randInitGmmParams(params, N, K, PRIOR);
     allocGmmGibbsState(&gibbsState, N, K, dataManaged, PRIOR, params);
-//    printParams(params, dataManaged, N, K);
 
     gibbs(gibbsState, ITERS);
     printParams(params, dataManaged, N, K);
@@ -77,16 +77,20 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
     for (int i = 0; i < n; i++) {
         if (i < n / k) {
             min = 50;
-            mod = 100;
+            mod = 10;
             cat = 0;
-        } else if (i < 2 * n / k) {
+        } else if (i < 2*n / k) {
             min = 12;
-            mod = 25;
+            mod = 4;
             cat = 1;
-        } else {
-            min = -10;
+        } else if (i < 3*n / k) {
+            min = -20;
             mod = 3;
             cat = 2;
+        } else {
+            min = -90;
+            mod = 3;
+            cat = 3;
         }
         data[i] = min + (rand() % mod);
         zs[i] = cat;
