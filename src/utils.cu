@@ -17,7 +17,7 @@ void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k)
         dst[i] = u[i] + v[i];
 }
 
-void normalize(DTYPE *v, size_t n)
+__host__ __device__ void normalize(DTYPE *v, size_t n)
 {
     DTYPE sum = 0;
     for(int i=0; i < n; i++)

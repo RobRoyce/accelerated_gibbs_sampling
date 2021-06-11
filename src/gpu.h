@@ -14,3 +14,12 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
         if (abort) exit(code);
     }
 }
+
+// cuRAND state array for uniform distributions
+__device__ curandState *curandStates = nullptr;
+
+__global__ void setup_kernel(curandState *state) {
+    int id = threadIdx.x + blockIdx.x * blockDim.x;
+    /* Each thread gets same seed, a different sequence number, no offset */
+    curand_init(1234, id, 0, &state[id]);
+}

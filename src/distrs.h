@@ -7,16 +7,16 @@ __device__ DTYPE uniform_cuda(DTYPE a, DTYPE b, DTYPE *dest, size_t n);
 //DTYPE gamma_cuda(DTYPE shape, DTYPE rate);
 //DTYPE inverse_gamma_cuda(DTYPE shape, DTYPE scale);
 
-DTYPE uniform(DTYPE a, DTYPE b);
+__host__ __device__ DTYPE uniform(DTYPE a, DTYPE b);
 DTYPE uniform_pdf(DTYPE x, DTYPE a, DTYPE b);
 DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b);
 
-int categorical(DTYPE *param, size_t n);
+__host__ __device__ int categorical(DTYPE *param, size_t n);
 DTYPE categorical_pdf(int x, DTYPE *param, size_t n);
 DTYPE categorical_cdf(int x, DTYPE *param, size_t n);
 
 DTYPE gaussian(DTYPE mean, DTYPE var);
-DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var);
+__host__ __device__ DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var);
 DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var);
 
 DTYPE gamma(DTYPE shape, DTYPE rate);

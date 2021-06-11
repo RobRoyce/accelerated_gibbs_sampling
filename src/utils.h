@@ -8,13 +8,13 @@ typedef float DTYPE;
 void vecAddDd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k);
 void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k);
 
-void normalize(DTYPE *v, size_t n);
+__host__ __device__ void normalize(DTYPE *v, size_t n);
 
 DTYPE square(DTYPE x);
 
 DTYPE ligamma(DTYPE s, DTYPE x);
 
-extern DTYPE uigamma(DTYPE s, DTYPE x);
+DTYPE uigamma(DTYPE s, DTYPE x);
 
 DTYPE beta(DTYPE *x, size_t n);
 

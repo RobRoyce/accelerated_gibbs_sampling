@@ -35,8 +35,13 @@ void uniform_cuda(DTYPE *a, DTYPE *b, DTYPE *dest, size_t n) {
     cudaMemcpy(dest, d_data, n * sizeof(DTYPE), cudaMemcpyDeviceToHost);
 }
 
-DTYPE uniform(DTYPE a, DTYPE b) {
+__host__ __device__ DTYPE uniform(DTYPE a, DTYPE b) {
+#ifdef __CUDA_ARCH__
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    return a + curand_uniform(&curandStates[i]) * (b - a);
+#else
     return a + rand() * (b - a) / RAND_MAX;
+#endif
 }
 
 DTYPE uniform_pdf(DTYPE x, DTYPE a, DTYPE b) {
@@ -47,7 +52,7 @@ DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b) {
     return x < a ? 0 : x < b ? (x - a) / (b - a) : 1;
 }
 
-int categorical(DTYPE *param, size_t n) {
+__host__ __device__ int categorical(DTYPE *param, size_t n) {
     DTYPE u = uniform(0, 1), sum = 0;
     int i = 0;
     while (u > sum)
@@ -81,8 +86,8 @@ DTYPE gaussian(DTYPE mean, DTYPE var) {
     return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
 }
 
-DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
-    return exp(-square(x - mean) / 2 / var) / sqrt(2 * M_PI * var);
+__host__ __device__ DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
+    return exp(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
 }
 
 DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {

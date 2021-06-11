@@ -66,13 +66,18 @@ void updateWeights(struct GmmGibbsState *state) {
 
 void updateMeans(struct GmmGibbsState *state) {
     DTYPE k = 1 / state->prior.meansVarPrior,
-            zeta = state->prior.meansMeanPrior, mean, var;
+            zeta = state->prior.meansMeanPrior,
+            mean,
+            var;
 
     for (int j = 0; j < state->k; j++) {
-        DTYPE sum_xs = state->ss->compSums[j], ns = state->ss->ns[j],
+        DTYPE sum_xs = state->ss->compSums[j],
+                ns = state->ss->ns[j],
                 sigma2 = state->params->vars[j];
+
         mean = (k * zeta + sum_xs / sigma2) / (ns / sigma2 + k);
         var = 1 / (ns / sigma2 + k);
+
         state->params->means[j] = gaussian(mean, var);
     }
 }
@@ -91,38 +96,42 @@ void updateVars(struct GmmGibbsState *state) {
     }
 }
 
-void updateZs(struct GmmGibbsState *state) {
-    DTYPE weights[state->k], mu, sigma2;
+__global__ void updateZs(struct GmmGibbsState *state, const size_t k) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    DTYPE weights[4];
+    DTYPE mu, sigma2;
 
-    for (int i = 0; i < state->n; i++) {
-        DTYPE x = state->data[i];
+    DTYPE x = state->data[i];
 
-        for (int j = 0; j < state->k; j++) {
-            mu = state->params->means[j];
-            sigma2 = state->params->vars[j];
-            weights[j] = gaussian_pdf(x, mu, sigma2);
-        }
-
-        normalize(weights, state->k);
-        state->params->zs[i] = categorical(weights, state->k);
+    for (int j = 0; j < state->k; j++) {
+        mu = state->params->means[j];
+        sigma2 = state->params->vars[j];
+        weights[j] = gaussian_pdf(x, mu, sigma2);
     }
+
+    normalize(weights, state->k);
+    state->params->zs[i] = categorical(weights, state->k);
 }
 
-void gibbs(struct GmmGibbsState *state, size_t iters) {
-    dim3 kThreads(state->k, 1, 1);
+void gibbs(struct GmmGibbsState *gibbsState, size_t iters) {
+    dim3 kThreads(gibbsState->k, 1, 1);
     dim3 kBlocks(1, 1, 1);
     dim3 nThreads(1024, 1, 1);
-    dim3 nBlocks(state->n / nThreads.x, 1, 1);
+    dim3 nBlocks(gibbsState->n / nThreads.x, 1, 1);
+
+    gpuErrchk(cudaMalloc((void **) &curandStates, gibbsState->n * sizeof(curandState)));
+    setup_kernel<<<nBlocks, nThreads>>>(curandStates);
+    gpuErrchk(cudaDeviceSynchronize());
 
     while (iters--) {
-        clearSufficientStatistic<<<kBlocks, kThreads>>>(state);
-        updateSufficientStatistic<<<nBlocks, nThreads>>>(state);
+        clearSufficientStatistic<<<kBlocks, kThreads>>>(gibbsState);
+        updateSufficientStatistic<<<nBlocks, nThreads>>>(gibbsState);
         gpuErrchk(cudaDeviceSynchronize());
 
-        updateWeights(state);
-        updateMeans(state);
-        updateVars(state);
-        updateZs(state);
+        updateWeights(gibbsState);
+        updateMeans(gibbsState);
+        updateVars(gibbsState);
+        updateZs<<<nBlocks, nThreads>>>(gibbsState, gibbsState->k);
     }
 
 }
