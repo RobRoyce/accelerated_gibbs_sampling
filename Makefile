@@ -1,5 +1,5 @@
-CC=nvcc -pg
-CFLAGS=-lm -lcudadevrt -lcurand -g -arch=sm_60
+CC=nvcc
+CFLAGS=-lm -lcurand
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test
 MODULES := distrs utils gmm gmm_gibbs
