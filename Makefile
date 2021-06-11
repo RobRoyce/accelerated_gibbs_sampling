@@ -32,96 +32,430 @@ cont_gof_test: test/cont_gof_test.cu
 #	./bin/$@
 
 int_test: test/int_test.cu
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=64 obj/* $^ -o 	bin/$@-1
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=32 obj/* $^ -o 	bin/$@-2
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=16 obj/* $^ -o 	bin/$@-3
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=8 obj/* $^ -o 	bin/$@-4
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=4 obj/* $^ -o 	bin/$@-5
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=2 obj/* $^ -o 	bin/$@-6
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=64 obj/* $^ -o 	bin/$@-7
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=32 obj/* $^ -o 	bin/$@-8
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=16 obj/* $^ -o 	bin/$@-9
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=8 obj/* $^ -o 	bin/$@-10
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=4 obj/* $^ -o 	bin/$@-11
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=2 obj/* $^ -o 	bin/$@-12
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=64 obj/* $^ -o 	bin/$@-13
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=32 obj/* $^ -o 	bin/$@-14
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=16 obj/* $^ -o 	bin/$@-15
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=8 obj/* $^ -o 	bin/$@-16
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=4 obj/* $^ -o 	bin/$@-17
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=2 obj/* $^ -o 	bin/$@-18
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=64 obj/* $^ -o 	bin/$@-19
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=32 obj/* $^ -o 	bin/$@-20
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=16 obj/* $^ -o 	bin/$@-21
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=8 obj/* $^ -o 	bin/$@-22
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=4 obj/* $^ -o 	bin/$@-23
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=2 obj/* $^ -o 	bin/$@-24
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=64 obj/* $^ -o 	bin/$@-25
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=32 obj/* $^ -o 	bin/$@-26
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=16 obj/* $^ -o 	bin/$@-27
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=8 obj/* $^ -o 	bin/$@-28
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=4 obj/* $^ -o 	bin/$@-29
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=2 obj/* $^ -o 	bin/$@-30
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=64 obj/* $^ -o 	bin/$@-31
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=32 obj/* $^ -o 	bin/$@-32
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=16 obj/* $^ -o 	bin/$@-33
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=8 obj/* $^ -o 	bin/$@-34
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=4 obj/* $^ -o 	bin/$@-35
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=2 obj/* $^ -o 	bin/$@-36
-	$(CC) $(CFLAGS) -DNSAMPLES=8192 -DKCLASSES=128 obj/* $^ -o 	bin/$@-37
-	$(CC) $(CFLAGS) -DNSAMPLES=4086 -DKCLASSES=128 obj/* $^ -o 	bin/$@-38
-	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=128 obj/* $^ -o 	bin/$@-39
-	$(CC) $(CFLAGS) -DNSAMPLES=1024 -DKCLASSES=128 obj/* $^ -o 	bin/$@-40
-	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=128 obj/* $^ -o 	bin/$@-41
-	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=128 obj/* $^ -o 	bin/$@-42
-	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=128 obj/* $^ -o 	bin/$@-43
-	echo "N, K, Time(usec)" > results.csv
-	./bin/$@-1  >> results.csv
-	./bin/$@-2  >> results.csv
-	./bin/$@-3  >> results.csv
-	./bin/$@-4  >> results.csv
-	./bin/$@-5  >> results.csv
-	./bin/$@-6  >> results.csv
-	./bin/$@-7  >> results.csv
-	./bin/$@-8  >> results.csv
-	./bin/$@-9  >> results.csv
-	./bin/$@-10 >> results.csv
-	./bin/$@-11 >> results.csv
-	./bin/$@-12 >> results.csv
-	./bin/$@-13 >> results.csv
-	./bin/$@-14 >> results.csv
-	./bin/$@-15 >> results.csv
-	./bin/$@-16 >> results.csv
-	./bin/$@-17 >> results.csv
-	./bin/$@-18 >> results.csv
-	./bin/$@-19 >> results.csv
-	./bin/$@-20 >> results.csv
-	./bin/$@-21 >> results.csv
-	./bin/$@-22 >> results.csv
-	./bin/$@-23 >> results.csv
-	./bin/$@-24 >> results.csv
-	./bin/$@-25 >> results.csv
-	./bin/$@-26 >> results.csv
-	./bin/$@-27 >> results.csv
-	./bin/$@-28 >> results.csv
-	./bin/$@-29 >> results.csv
-	./bin/$@-30 >> results.csv
-	./bin/$@-31 >> results.csv
-	./bin/$@-32 >> results.csv
-	./bin/$@-33 >> results.csv
-	./bin/$@-34 >> results.csv
-	./bin/$@-35 >> results.csv
-	./bin/$@-36 >> results.csv
-	./bin/$@-37 >> results.csv
-	./bin/$@-38 >> results.csv
-	./bin/$@-39 >> results.csv
-	./bin/$@-40 >> results.csv
-	./bin/$@-41 >> results.csv
-	./bin/$@-42 >> results.csv
-	./bin/$@-43 >> results.csv
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=2 obj/* $^ -o bin/$@-1
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=4 obj/* $^ -o bin/$@-2
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=8 obj/* $^ -o bin/$@-3
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=16 obj/* $^ -o bin/$@-4
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=32 obj/* $^ -o bin/$@-5
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=64 obj/* $^ -o bin/$@-6
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=128 obj/* $^ -o bin/$@-7
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=1 obj/* $^ -o bin/$@-8
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=3 obj/* $^ -o bin/$@-9
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=7 obj/* $^ -o bin/$@-10
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=15 obj/* $^ -o bin/$@-11
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=31 obj/* $^ -o bin/$@-12
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=63 obj/* $^ -o bin/$@-13
+	$(CC) $(CFLAGS) -DNSAMPLES=4  -DKCLASSES=127 obj/* $^ -o bin/$@-14
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=2 obj/* $^ -o bin/$@-15
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=4 obj/* $^ -o bin/$@-16
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=8 obj/* $^ -o bin/$@-17
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=16 obj/* $^ -o bin/$@-18
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=32 obj/* $^ -o bin/$@-19
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=64 obj/* $^ -o bin/$@-20
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=128 obj/* $^ -o bin/$@-21
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=1 obj/* $^ -o bin/$@-22
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=3 obj/* $^ -o bin/$@-23
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=7 obj/* $^ -o bin/$@-24
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=15 obj/* $^ -o bin/$@-25
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=31 obj/* $^ -o bin/$@-26
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=63 obj/* $^ -o bin/$@-27
+	$(CC) $(CFLAGS) -DNSAMPLES=8  -DKCLASSES=127 obj/* $^ -o bin/$@-28
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=2 obj/* $^ -o bin/$@-29
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=4 obj/* $^ -o bin/$@-30
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=8 obj/* $^ -o bin/$@-31
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=16 obj/* $^ -o bin/$@-32
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=32 obj/* $^ -o bin/$@-33
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=64 obj/* $^ -o bin/$@-34
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=128 obj/* $^ -o bin/$@-35
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=1 obj/* $^ -o bin/$@-36
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=3 obj/* $^ -o bin/$@-37
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=7 obj/* $^ -o bin/$@-38
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=15 obj/* $^ -o bin/$@-39
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=31 obj/* $^ -o bin/$@-40
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=63 obj/* $^ -o bin/$@-41
+	$(CC) $(CFLAGS) -DNSAMPLES=16  -DKCLASSES=127 obj/* $^ -o bin/$@-42
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=2 obj/* $^ -o bin/$@-43
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=4 obj/* $^ -o bin/$@-44
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=8 obj/* $^ -o bin/$@-45
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=16 obj/* $^ -o bin/$@-46
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=32 obj/* $^ -o bin/$@-47
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=64 obj/* $^ -o bin/$@-48
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=128 obj/* $^ -o bin/$@-49
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=1 obj/* $^ -o bin/$@-50
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=3 obj/* $^ -o bin/$@-51
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=7 obj/* $^ -o bin/$@-52
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=15 obj/* $^ -o bin/$@-53
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=31 obj/* $^ -o bin/$@-54
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=63 obj/* $^ -o bin/$@-55
+	$(CC) $(CFLAGS) -DNSAMPLES=32  -DKCLASSES=127 obj/* $^ -o bin/$@-56
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=2 obj/* $^ -o bin/$@-57
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=4 obj/* $^ -o bin/$@-58
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=8 obj/* $^ -o bin/$@-59
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=16 obj/* $^ -o bin/$@-60
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=32 obj/* $^ -o bin/$@-61
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=64 obj/* $^ -o bin/$@-62
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=128 obj/* $^ -o bin/$@-63
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=1 obj/* $^ -o bin/$@-64
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=3 obj/* $^ -o bin/$@-65
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=7 obj/* $^ -o bin/$@-66
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=15 obj/* $^ -o bin/$@-67
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=31 obj/* $^ -o bin/$@-68
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=63 obj/* $^ -o bin/$@-69
+	$(CC) $(CFLAGS) -DNSAMPLES=64  -DKCLASSES=127 obj/* $^ -o bin/$@-70
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=2 obj/* $^ -o bin/$@-71
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=4 obj/* $^ -o bin/$@-72
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=8 obj/* $^ -o bin/$@-73
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=16 obj/* $^ -o bin/$@-74
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=32 obj/* $^ -o bin/$@-75
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=64 obj/* $^ -o bin/$@-76
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=128 obj/* $^ -o bin/$@-77
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=1 obj/* $^ -o bin/$@-78
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=3 obj/* $^ -o bin/$@-79
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=7 obj/* $^ -o bin/$@-80
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=15 obj/* $^ -o bin/$@-81
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=31 obj/* $^ -o bin/$@-82
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=63 obj/* $^ -o bin/$@-83
+	$(CC) $(CFLAGS) -DNSAMPLES=128  -DKCLASSES=127 obj/* $^ -o bin/$@-84
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=2 obj/* $^ -o bin/$@-85
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=4 obj/* $^ -o bin/$@-86
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=8 obj/* $^ -o bin/$@-87
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=16 obj/* $^ -o bin/$@-88
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=32 obj/* $^ -o bin/$@-89
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=64 obj/* $^ -o bin/$@-90
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=128 obj/* $^ -o bin/$@-91
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=1 obj/* $^ -o bin/$@-92
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=3 obj/* $^ -o bin/$@-93
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=7 obj/* $^ -o bin/$@-94
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=15 obj/* $^ -o bin/$@-95
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=31 obj/* $^ -o bin/$@-96
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=63 obj/* $^ -o bin/$@-97
+	$(CC) $(CFLAGS) -DNSAMPLES=256  -DKCLASSES=127 obj/* $^ -o bin/$@-98
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=2 obj/* $^ -o bin/$@-99
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=4 obj/* $^ -o bin/$@-100
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=8 obj/* $^ -o bin/$@-101
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=16 obj/* $^ -o bin/$@-102
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=32 obj/* $^ -o bin/$@-103
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=64 obj/* $^ -o bin/$@-104
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=128 obj/* $^ -o bin/$@-105
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=1 obj/* $^ -o bin/$@-106
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=3 obj/* $^ -o bin/$@-107
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=7 obj/* $^ -o bin/$@-108
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=15 obj/* $^ -o bin/$@-109
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=31 obj/* $^ -o bin/$@-110
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=63 obj/* $^ -o bin/$@-111
+	$(CC) $(CFLAGS) -DNSAMPLES=512  -DKCLASSES=127 obj/* $^ -o bin/$@-112
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=2 obj/* $^ -o bin/$@-113
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=4 obj/* $^ -o bin/$@-114
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=8 obj/* $^ -o bin/$@-115
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=16 obj/* $^ -o bin/$@-116
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=32 obj/* $^ -o bin/$@-117
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=64 obj/* $^ -o bin/$@-118
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=128 obj/* $^ -o bin/$@-119
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=1 obj/* $^ -o bin/$@-120
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=3 obj/* $^ -o bin/$@-121
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=7 obj/* $^ -o bin/$@-122
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=15 obj/* $^ -o bin/$@-123
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=31 obj/* $^ -o bin/$@-124
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=63 obj/* $^ -o bin/$@-125
+	$(CC) $(CFLAGS) -DNSAMPLES=1024  -DKCLASSES=127 obj/* $^ -o bin/$@-126
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=2 obj/* $^ -o bin/$@-127
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=4 obj/* $^ -o bin/$@-128
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=8 obj/* $^ -o bin/$@-129
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=16 obj/* $^ -o bin/$@-130
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=32 obj/* $^ -o bin/$@-131
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=64 obj/* $^ -o bin/$@-132
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=128 obj/* $^ -o bin/$@-133
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=1 obj/* $^ -o bin/$@-134
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=3 obj/* $^ -o bin/$@-135
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=7 obj/* $^ -o bin/$@-136
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=15 obj/* $^ -o bin/$@-137
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=31 obj/* $^ -o bin/$@-138
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=63 obj/* $^ -o bin/$@-139
+	$(CC) $(CFLAGS) -DNSAMPLES=2048  -DKCLASSES=127 obj/* $^ -o bin/$@-140
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=2 obj/* $^ -o bin/$@-141
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=4 obj/* $^ -o bin/$@-142
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=8 obj/* $^ -o bin/$@-143
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=16 obj/* $^ -o bin/$@-144
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=32 obj/* $^ -o bin/$@-145
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=64 obj/* $^ -o bin/$@-146
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=128 obj/* $^ -o bin/$@-147
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=1 obj/* $^ -o bin/$@-148
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=3 obj/* $^ -o bin/$@-149
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=7 obj/* $^ -o bin/$@-150
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=15 obj/* $^ -o bin/$@-151
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=31 obj/* $^ -o bin/$@-152
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=63 obj/* $^ -o bin/$@-153
+	$(CC) $(CFLAGS) -DNSAMPLES=4096  -DKCLASSES=127 obj/* $^ -o bin/$@-154
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=2 obj/* $^ -o bin/$@-155
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=4 obj/* $^ -o bin/$@-156
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=8 obj/* $^ -o bin/$@-157
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=16 obj/* $^ -o bin/$@-158
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=32 obj/* $^ -o bin/$@-159
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=64 obj/* $^ -o bin/$@-160
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=128 obj/* $^ -o bin/$@-161
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=1 obj/* $^ -o bin/$@-162
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=3 obj/* $^ -o bin/$@-163
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=7 obj/* $^ -o bin/$@-164
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=15 obj/* $^ -o bin/$@-165
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=31 obj/* $^ -o bin/$@-166
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=63 obj/* $^ -o bin/$@-167
+	$(CC) $(CFLAGS) -DNSAMPLES=8192  -DKCLASSES=127 obj/* $^ -o bin/$@-168
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=2 obj/* $^ -o bin/$@-169
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=4 obj/* $^ -o bin/$@-170
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=8 obj/* $^ -o bin/$@-171
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=16 obj/* $^ -o bin/$@-172
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=32 obj/* $^ -o bin/$@-173
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=64 obj/* $^ -o bin/$@-174
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=128 obj/* $^ -o bin/$@-175
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=1 obj/* $^ -o bin/$@-176
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=3 obj/* $^ -o bin/$@-177
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=7 obj/* $^ -o bin/$@-178
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=15 obj/* $^ -o bin/$@-179
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=31 obj/* $^ -o bin/$@-180
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=63 obj/* $^ -o bin/$@-181
+	$(CC) $(CFLAGS) -DNSAMPLES=16384  -DKCLASSES=127 obj/* $^ -o bin/$@-182
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=2 obj/* $^ -o bin/$@-183
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=4 obj/* $^ -o bin/$@-184
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=8 obj/* $^ -o bin/$@-185
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=16 obj/* $^ -o bin/$@-186
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=32 obj/* $^ -o bin/$@-187
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=64 obj/* $^ -o bin/$@-188
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=128 obj/* $^ -o bin/$@-189
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=1 obj/* $^ -o bin/$@-190
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=3 obj/* $^ -o bin/$@-191
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=7 obj/* $^ -o bin/$@-192
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=15 obj/* $^ -o bin/$@-193
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=31 obj/* $^ -o bin/$@-194
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=63 obj/* $^ -o bin/$@-195
+	$(CC) $(CFLAGS) -DNSAMPLES=32768  -DKCLASSES=127 obj/* $^ -o bin/$@-196
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=2 obj/* $^ -o bin/$@-197
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=4 obj/* $^ -o bin/$@-198
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=8 obj/* $^ -o bin/$@-199
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=16 obj/* $^ -o bin/$@-200
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=32 obj/* $^ -o bin/$@-201
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=64 obj/* $^ -o bin/$@-202
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=128 obj/* $^ -o bin/$@-203
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=1 obj/* $^ -o bin/$@-204
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=3 obj/* $^ -o bin/$@-205
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=7 obj/* $^ -o bin/$@-206
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=15 obj/* $^ -o bin/$@-207
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=31 obj/* $^ -o bin/$@-208
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=63 obj/* $^ -o bin/$@-209
+	$(CC) $(CFLAGS) -DNSAMPLES=65536  -DKCLASSES=127 obj/* $^ -o bin/$@-210
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=2 obj/* $^ -o bin/$@-211
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=4 obj/* $^ -o bin/$@-212
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=8 obj/* $^ -o bin/$@-213
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=16 obj/* $^ -o bin/$@-214
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=32 obj/* $^ -o bin/$@-215
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=64 obj/* $^ -o bin/$@-216
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=128 obj/* $^ -o bin/$@-217
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=1 obj/* $^ -o bin/$@-218
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=3 obj/* $^ -o bin/$@-219
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=7 obj/* $^ -o bin/$@-220
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=15 obj/* $^ -o bin/$@-221
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=31 obj/* $^ -o bin/$@-222
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=63 obj/* $^ -o bin/$@-223
+	$(CC) $(CFLAGS) -DNSAMPLES=3  -DKCLASSES=127 obj/* $^ -o bin/$@-224
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=2 obj/* $^ -o bin/$@-225
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=4 obj/* $^ -o bin/$@-226
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=8 obj/* $^ -o bin/$@-227
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=16 obj/* $^ -o bin/$@-228
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=32 obj/* $^ -o bin/$@-229
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=64 obj/* $^ -o bin/$@-230
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=128 obj/* $^ -o bin/$@-231
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=1 obj/* $^ -o bin/$@-232
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=3 obj/* $^ -o bin/$@-233
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=7 obj/* $^ -o bin/$@-234
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=15 obj/* $^ -o bin/$@-235
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=31 obj/* $^ -o bin/$@-236
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=63 obj/* $^ -o bin/$@-237
+	$(CC) $(CFLAGS) -DNSAMPLES=7  -DKCLASSES=127 obj/* $^ -o bin/$@-238
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=2 obj/* $^ -o bin/$@-239
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=4 obj/* $^ -o bin/$@-240
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=8 obj/* $^ -o bin/$@-241
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=16 obj/* $^ -o bin/$@-242
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=32 obj/* $^ -o bin/$@-243
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=64 obj/* $^ -o bin/$@-244
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=128 obj/* $^ -o bin/$@-245
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=1 obj/* $^ -o bin/$@-246
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=3 obj/* $^ -o bin/$@-247
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=7 obj/* $^ -o bin/$@-248
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=15 obj/* $^ -o bin/$@-249
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=31 obj/* $^ -o bin/$@-250
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=63 obj/* $^ -o bin/$@-251
+	$(CC) $(CFLAGS) -DNSAMPLES=15  -DKCLASSES=127 obj/* $^ -o bin/$@-252
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=2 obj/* $^ -o bin/$@-253
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=4 obj/* $^ -o bin/$@-254
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=8 obj/* $^ -o bin/$@-255
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=16 obj/* $^ -o bin/$@-256
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=32 obj/* $^ -o bin/$@-257
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=64 obj/* $^ -o bin/$@-258
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=128 obj/* $^ -o bin/$@-259
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=1 obj/* $^ -o bin/$@-260
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=3 obj/* $^ -o bin/$@-261
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=7 obj/* $^ -o bin/$@-262
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=15 obj/* $^ -o bin/$@-263
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=31 obj/* $^ -o bin/$@-264
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=63 obj/* $^ -o bin/$@-265
+	$(CC) $(CFLAGS) -DNSAMPLES=31  -DKCLASSES=127 obj/* $^ -o bin/$@-266
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=2 obj/* $^ -o bin/$@-267
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=4 obj/* $^ -o bin/$@-268
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=8 obj/* $^ -o bin/$@-269
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=16 obj/* $^ -o bin/$@-270
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=32 obj/* $^ -o bin/$@-271
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=64 obj/* $^ -o bin/$@-272
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=128 obj/* $^ -o bin/$@-273
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=1 obj/* $^ -o bin/$@-274
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=3 obj/* $^ -o bin/$@-275
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=7 obj/* $^ -o bin/$@-276
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=15 obj/* $^ -o bin/$@-277
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=31 obj/* $^ -o bin/$@-278
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=63 obj/* $^ -o bin/$@-279
+	$(CC) $(CFLAGS) -DNSAMPLES=63  -DKCLASSES=127 obj/* $^ -o bin/$@-280
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=2 obj/* $^ -o bin/$@-281
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=4 obj/* $^ -o bin/$@-282
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=8 obj/* $^ -o bin/$@-283
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=16 obj/* $^ -o bin/$@-284
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=32 obj/* $^ -o bin/$@-285
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=64 obj/* $^ -o bin/$@-286
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=128 obj/* $^ -o bin/$@-287
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=1 obj/* $^ -o bin/$@-288
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=3 obj/* $^ -o bin/$@-289
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=7 obj/* $^ -o bin/$@-290
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=15 obj/* $^ -o bin/$@-291
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=31 obj/* $^ -o bin/$@-292
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=63 obj/* $^ -o bin/$@-293
+	$(CC) $(CFLAGS) -DNSAMPLES=127  -DKCLASSES=127 obj/* $^ -o bin/$@-294
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=2 obj/* $^ -o bin/$@-295
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=4 obj/* $^ -o bin/$@-296
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=8 obj/* $^ -o bin/$@-297
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=16 obj/* $^ -o bin/$@-298
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=32 obj/* $^ -o bin/$@-299
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=64 obj/* $^ -o bin/$@-300
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=128 obj/* $^ -o bin/$@-301
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=1 obj/* $^ -o bin/$@-302
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=3 obj/* $^ -o bin/$@-303
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=7 obj/* $^ -o bin/$@-304
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=15 obj/* $^ -o bin/$@-305
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=31 obj/* $^ -o bin/$@-306
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=63 obj/* $^ -o bin/$@-307
+	$(CC) $(CFLAGS) -DNSAMPLES=255  -DKCLASSES=127 obj/* $^ -o bin/$@-308
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=2 obj/* $^ -o bin/$@-309
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=4 obj/* $^ -o bin/$@-310
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=8 obj/* $^ -o bin/$@-311
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=16 obj/* $^ -o bin/$@-312
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=32 obj/* $^ -o bin/$@-313
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=64 obj/* $^ -o bin/$@-314
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=128 obj/* $^ -o bin/$@-315
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=1 obj/* $^ -o bin/$@-316
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=3 obj/* $^ -o bin/$@-317
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=7 obj/* $^ -o bin/$@-318
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=15 obj/* $^ -o bin/$@-319
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=31 obj/* $^ -o bin/$@-320
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=63 obj/* $^ -o bin/$@-321
+	$(CC) $(CFLAGS) -DNSAMPLES=511  -DKCLASSES=127 obj/* $^ -o bin/$@-322
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=2 obj/* $^ -o bin/$@-323
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=4 obj/* $^ -o bin/$@-324
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=8 obj/* $^ -o bin/$@-325
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=16 obj/* $^ -o bin/$@-326
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=32 obj/* $^ -o bin/$@-327
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=64 obj/* $^ -o bin/$@-328
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=128 obj/* $^ -o bin/$@-329
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=1 obj/* $^ -o bin/$@-330
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=3 obj/* $^ -o bin/$@-331
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=7 obj/* $^ -o bin/$@-332
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=15 obj/* $^ -o bin/$@-333
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=31 obj/* $^ -o bin/$@-334
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=63 obj/* $^ -o bin/$@-335
+	$(CC) $(CFLAGS) -DNSAMPLES=1023  -DKCLASSES=127 obj/* $^ -o bin/$@-336
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=2 obj/* $^ -o bin/$@-337
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=4 obj/* $^ -o bin/$@-338
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=8 obj/* $^ -o bin/$@-339
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=16 obj/* $^ -o bin/$@-340
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=32 obj/* $^ -o bin/$@-341
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=64 obj/* $^ -o bin/$@-342
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=128 obj/* $^ -o bin/$@-343
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=1 obj/* $^ -o bin/$@-344
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=3 obj/* $^ -o bin/$@-345
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=7 obj/* $^ -o bin/$@-346
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=15 obj/* $^ -o bin/$@-347
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=31 obj/* $^ -o bin/$@-348
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=63 obj/* $^ -o bin/$@-349
+	$(CC) $(CFLAGS) -DNSAMPLES=2047  -DKCLASSES=127 obj/* $^ -o bin/$@-350
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=2 obj/* $^ -o bin/$@-351
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=4 obj/* $^ -o bin/$@-352
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=8 obj/* $^ -o bin/$@-353
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=16 obj/* $^ -o bin/$@-354
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=32 obj/* $^ -o bin/$@-355
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=64 obj/* $^ -o bin/$@-356
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=128 obj/* $^ -o bin/$@-357
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=1 obj/* $^ -o bin/$@-358
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=3 obj/* $^ -o bin/$@-359
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=7 obj/* $^ -o bin/$@-360
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=15 obj/* $^ -o bin/$@-361
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=31 obj/* $^ -o bin/$@-362
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=63 obj/* $^ -o bin/$@-363
+	$(CC) $(CFLAGS) -DNSAMPLES=4095  -DKCLASSES=127 obj/* $^ -o bin/$@-364
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=2 obj/* $^ -o bin/$@-365
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=4 obj/* $^ -o bin/$@-366
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=8 obj/* $^ -o bin/$@-367
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=16 obj/* $^ -o bin/$@-368
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=32 obj/* $^ -o bin/$@-369
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=64 obj/* $^ -o bin/$@-370
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=128 obj/* $^ -o bin/$@-371
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=1 obj/* $^ -o bin/$@-372
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=3 obj/* $^ -o bin/$@-373
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=7 obj/* $^ -o bin/$@-374
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=15 obj/* $^ -o bin/$@-375
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=31 obj/* $^ -o bin/$@-376
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=63 obj/* $^ -o bin/$@-377
+	$(CC) $(CFLAGS) -DNSAMPLES=8191  -DKCLASSES=127 obj/* $^ -o bin/$@-378
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=2 obj/* $^ -o bin/$@-379
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=4 obj/* $^ -o bin/$@-380
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=8 obj/* $^ -o bin/$@-381
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=16 obj/* $^ -o bin/$@-382
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=32 obj/* $^ -o bin/$@-383
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=64 obj/* $^ -o bin/$@-384
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=128 obj/* $^ -o bin/$@-385
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=1 obj/* $^ -o bin/$@-386
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=3 obj/* $^ -o bin/$@-387
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=7 obj/* $^ -o bin/$@-388
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=15 obj/* $^ -o bin/$@-389
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=31 obj/* $^ -o bin/$@-390
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=63 obj/* $^ -o bin/$@-391
+	$(CC) $(CFLAGS) -DNSAMPLES=16383  -DKCLASSES=127 obj/* $^ -o bin/$@-392
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=2 obj/* $^ -o bin/$@-393
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=4 obj/* $^ -o bin/$@-394
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=8 obj/* $^ -o bin/$@-395
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=16 obj/* $^ -o bin/$@-396
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=32 obj/* $^ -o bin/$@-397
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=64 obj/* $^ -o bin/$@-398
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=128 obj/* $^ -o bin/$@-399
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=1 obj/* $^ -o bin/$@-400
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=3 obj/* $^ -o bin/$@-401
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=7 obj/* $^ -o bin/$@-402
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=15 obj/* $^ -o bin/$@-403
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=31 obj/* $^ -o bin/$@-404
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=63 obj/* $^ -o bin/$@-405
+	$(CC) $(CFLAGS) -DNSAMPLES=32767  -DKCLASSES=127 obj/* $^ -o bin/$@-406
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=2 obj/* $^ -o bin/$@-407
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=4 obj/* $^ -o bin/$@-408
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=8 obj/* $^ -o bin/$@-409
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=16 obj/* $^ -o bin/$@-410
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=32 obj/* $^ -o bin/$@-411
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=64 obj/* $^ -o bin/$@-412
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=128 obj/* $^ -o bin/$@-413
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=1 obj/* $^ -o bin/$@-414
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=3 obj/* $^ -o bin/$@-415
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=7 obj/* $^ -o bin/$@-416
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=15 obj/* $^ -o bin/$@-417
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=31 obj/* $^ -o bin/$@-418
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=63 obj/* $^ -o bin/$@-419
+	$(CC) $(CFLAGS) -DNSAMPLES=65535  -DKCLASSES=127 obj/* $^ -o bin/$@-420
+
 clean:
 	rm -rf bin
 	rm -rf obj
 
 test:
-	cd bin && ./cont_gof_test && ./int_test && ./cont_pdf_test
+	bash test/run_tests.sh

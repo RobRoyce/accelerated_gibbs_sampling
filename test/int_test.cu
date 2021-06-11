@@ -26,7 +26,7 @@ static __inline__ uint64_t gettime(void) {
 __attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
 __attribute__ ((noinline))  void end_roi() {
     usec = (gettime() - usec);
-    printf("%d, %d, %lu\n", N, K, usec);
+    printf("%d,%d,%lu\n", N, K, usec);
 }
 
 void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
