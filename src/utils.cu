@@ -5,14 +5,13 @@
 #include <stdlib.h>
 #include "utils.h"
 
-
-void vec_add_dd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k)
+void vecAddDd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k)
 {
     for(int i=0; i < k; i++)
         dst[i] = u[i] + v[i];
 }
 
-void vec_add_ud(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k)
+void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k)
 {
     for(int i=0; i < k; i++)
         dst[i] = u[i] + v[i];
@@ -45,7 +44,7 @@ DTYPE beta(DTYPE *x, size_t n)
     return gamma_prod / tgamma(sum);
 }
 
-void *abort_calloc(size_t nmemb, size_t size)
+void *abortCalloc(size_t nmemb, size_t size)
 {
     void *mem = calloc(nmemb, size);
     if(mem == NULL)
@@ -53,4 +52,4 @@ void *abort_calloc(size_t nmemb, size_t size)
     return mem;
 }
 
-void *abort_malloc(size_t size) { return abort_calloc(1, size); }
+void *abortMalloc(size_t size) { return abortCalloc(1, size); }

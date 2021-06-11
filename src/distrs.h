@@ -1,6 +1,12 @@
 #pragma once
 #include "utils.h"
 
+__device__ DTYPE uniform_cuda(DTYPE a, DTYPE b, DTYPE *dest, size_t n);
+//int categorical_cuda(DTYPE *param, size_t n);
+//DTYPE gaussian_cuda(DTYPE mean, DTYPE var);
+//DTYPE gamma_cuda(DTYPE shape, DTYPE rate);
+//DTYPE inverse_gamma_cuda(DTYPE shape, DTYPE scale);
+
 DTYPE uniform(DTYPE a, DTYPE b);
 DTYPE uniform_pdf(DTYPE x, DTYPE a, DTYPE b);
 DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b);

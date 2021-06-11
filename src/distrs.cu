@@ -1,15 +1,39 @@
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
-#include "distrs.h"
+#include <iostream>
+#include <stdio.h>
+#include "gpu.h"
 
 #ifndef M_E
-# define M_E 2.7182818284590452354    /* e */
+# define M_E 2.7182818284590452354 /* e */
 #endif
 #ifndef M_PI
-# define M_PI 3.14159265358979323846    /* pi */
+# define M_PI 3.14159265358979323846 /* pi */
 #endif
 
+#include "utils.h"
+#include "distrs.h"
+
+__global__ void vec_add(DTYPE *a, DTYPE *b, DTYPE *dest, int size, DTYPE *rand, DTYPE rand_max) {
+    int i = threadIdx.x;
+    dest[i] = a[i] + rand[i] * (b[i] - a[i]) / rand_max;
+}
+
+void uniform_cuda(DTYPE *a, DTYPE *b, DTYPE *dest, size_t n) {
+    curandGenerator_t gen;
+    DTYPE *d_data;
+
+    dest = (DTYPE *) calloc(n, sizeof(DTYPE));
+    cudaMalloc((void **) &d_data, n * sizeof(DTYPE));
+
+    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+    curandSetPseudoRandomGeneratorSeed(gen, 1234ULL);
+    curandGenerateUniform(gen, d_data, n);
+
+    vec_add<<<1, n>>>(a, b, dest, n, d_data, RAND_MAX);
+    cudaMemcpy(dest, d_data, n * sizeof(DTYPE), cudaMemcpyDeviceToHost);
+}
 
 DTYPE uniform(DTYPE a, DTYPE b) {
     return a + rand() * (b - a) / RAND_MAX;
@@ -46,6 +70,12 @@ DTYPE categorical_cdf(int x, DTYPE *param, size_t n) {
     return res;
 }
 
+//__global__
+//void gaussian_cuda(DTYPE mean, DTYPE var, DTYPE *dest, size_t n) {
+//    DTYPE u = uniform(0, 1), v = uniform(0, 1);
+//    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
+//}
+
 DTYPE gaussian(DTYPE mean, DTYPE var) {
     DTYPE u = uniform(0, 1), v = uniform(0, 1);
     return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
@@ -63,9 +93,11 @@ DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {
 DTYPE gamma(DTYPE shape, DTYPE rate) {
     int n = floor(shape);
     DTYPE delta = shape - n, exp_part = 0, xi, eta;
+
     while (n--)
         exp_part += -log(uniform(0, 1));
-    if (delta > DBL_EPSILON)
+
+    if (delta > DBL_EPSILON) {
         do {
             if (uniform(0, 1) < M_E / (M_E + delta)) {
                 xi = pow(uniform(0, 1), 1 / delta);
@@ -75,6 +107,7 @@ DTYPE gamma(DTYPE shape, DTYPE rate) {
                 eta = uniform(0, 1) * exp(-xi);
             }
         } while (eta > pow(xi, delta - 1) * exp(-xi));
+    }
     return (xi + exp_part) / rate;
 }
 
@@ -99,8 +132,9 @@ DTYPE inverse_gamma_cdf(DTYPE x, DTYPE shape, DTYPE scale) {
 }
 
 void dirichlet(DTYPE *dst, DTYPE *param, size_t n) {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) {
         dst[i] = gamma(param[i], 1);
+    }
     normalize(dst, n);
 }
 

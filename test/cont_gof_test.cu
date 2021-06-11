@@ -37,31 +37,24 @@ int cramer_von_mises(DTYPE (*sampler)(), DTYPE (*cdf)(DTYPE), std::string name) 
 }
 
 DTYPE sampler_1() { return uniform(0, 1); }
-
 DTYPE cdf_1(DTYPE x) { return uniform_cdf(x, 0, 1); }
 
 DTYPE sampler_2() { return gaussian(0, 1); }
-
 DTYPE cdf_2(DTYPE x) { return gaussian_cdf(x, 0, 1); }
 
 DTYPE sampler_3() { return gaussian(2, 0.4); }
-
 DTYPE cdf_3(DTYPE x) { return gaussian_cdf(x, 2, 0.4); }
 
 DTYPE sampler_4() { return gamma(1, 1); }
-
 DTYPE cdf_4(DTYPE x) { return gamma_cdf(x, 1, 1); }
 
 DTYPE sampler_5() { return gamma(1.25, 2); }
-
 DTYPE cdf_5(DTYPE x) { return gamma_cdf(x, 1.25, 2); }
 
 DTYPE sampler_6() { return inverse_gamma(1, 1); }
-
 DTYPE cdf_6(DTYPE x) { return inverse_gamma_cdf(x, 1, 1); }
 
 DTYPE sampler_7() { return inverse_gamma(1.25, 2); }
-
 DTYPE cdf_7(DTYPE x) { return inverse_gamma_cdf(x, 1.25, 2); }
 
 int main(int argc, char **argv) {
