@@ -6,7 +6,7 @@ typedef float DTYPE;
 
 // add `u` and `v` of length `k` and store the result in `dst`
 void vecAddDd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k);
-void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k);
+__host__ __device__ void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k);
 
 __host__ __device__ void normalize(DTYPE *v, size_t n);
 

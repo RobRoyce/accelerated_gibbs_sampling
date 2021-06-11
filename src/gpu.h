@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cuda.h>
 #include <curand_kernel.h>
 #include <curand.h>
@@ -16,10 +18,6 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 }
 
 // cuRAND state array for uniform distributions
-__device__ curandState *curandStates = nullptr;
+extern __device__ curandState curandStates[];
 
-__global__ void setup_kernel(curandState *state) {
-    int id = threadIdx.x + blockIdx.x * blockDim.x;
-    /* Each thread gets same seed, a different sequence number, no offset */
-    curand_init(1234, id, 0, &state[id]);
-}
+extern __global__ void setup_kernel();

@@ -11,10 +11,19 @@ void vecAddDd(DTYPE *dst, DTYPE *u, DTYPE *v, size_t k)
         dst[i] = u[i] + v[i];
 }
 
-void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k)
+__host__ __device__ void vecAddUd(DTYPE *dst, unsigned int *u, DTYPE *v, size_t k)
 {
+#ifdef __CUDA_ARCH__
+
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    dst[i] = u[i] + v[i];
+
+#else
+
     for(int i=0; i < k; i++)
         dst[i] = u[i] + v[i];
+
+#endif
 }
 
 __host__ __device__ void normalize(DTYPE *v, size_t n)
