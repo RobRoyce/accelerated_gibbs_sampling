@@ -5,8 +5,8 @@
 #include "gmm.h"
 #include "distrs.h"
 
-void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, DTYPE *data, struct GMMPrior prior,
-                        struct GMMParams *params) {
+void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, DTYPE *data,
+                        struct GMMPrior prior, struct GMMParams *params) {
     gpuErrchk(cudaMallocManaged(s, sizeof(struct GmmGibbsState)));
 
     struct GmmGibbsState *state = *s;
@@ -37,14 +37,14 @@ void freeGmmGibbsState(struct GmmGibbsState *state) {
 }
 
 __global__ void clearSufficientStatistic(struct GmmGibbsState *state) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
     state->ss->ns[i] = 0;
     state->ss->compSums[i] = 0;
     state->ss->compSquaredSums[i] = 0;
 }
 
-__global__ void updateSufficientStatisticCuda(struct GmmGibbsState *state) {
-    int i = threadIdx.x;
+__global__ void updateSufficientStatistic(struct GmmGibbsState *state) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
     DTYPE x = state->data[i];
     unsigned int z = state->params->zs[i];
 
@@ -109,13 +109,20 @@ void updateZs(struct GmmGibbsState *state) {
 }
 
 void gibbs(struct GmmGibbsState *state, size_t iters) {
+    dim3 kThreads(state->k, 1, 1);
+    dim3 kBlocks(1, 1, 1);
+    dim3 nThreads(1024, 1, 1);
+    dim3 nBlocks(state->n / nThreads.x, 1, 1);
+
     while (iters--) {
-        clearSufficientStatistic<<<1, state->k>>>(state);
-        updateSufficientStatisticCuda<<<1, state->n>>>(state);
+        clearSufficientStatistic<<<kBlocks, kThreads>>>(state);
+        updateSufficientStatistic<<<nBlocks, nThreads>>>(state);
+        gpuErrchk(cudaDeviceSynchronize());
+
         updateWeights(state);
         updateMeans(state);
         updateVars(state);
         updateZs(state);
     }
-    gpuErrchk(cudaDeviceSynchronize());
+
 }
