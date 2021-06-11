@@ -1,9 +1,21 @@
+#include <random>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
-#include <memory>
-#include <random>
 #include "../src/gmm.h"
+
+static uint64_t usec;
+static __inline__ uint64_t gettime(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (((uint64_t) tv.tv_sec) * 1000000 + ((uint64_t) tv.tv_usec));
+}
+__attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
+__attribute__ ((noinline))  void end_roi() {
+    usec = (gettime() - usec);
+    printf("elapsed (sec): %f\n", usec / 1000000.0);
+}
 
 void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
 
@@ -55,9 +67,12 @@ int main(int argc, char **argv) {
     randInitGmmParams(params, N, K, PRIOR);
     allocGmmGibbsState(&gibbsState, N, K, dataManaged, PRIOR, params);
 
+    begin_roi();
     gibbs(gibbsState, ITERS);
-    printParams(params, dataManaged, N, K);
-    verify(params, h_zs, N);
+    end_roi();
+
+//    printParams(params, dataManaged, N, K);
+//    verify(params, h_zs, N);
 
     freeGmmGibbsState(gibbsState);
     gpuErrchk(cudaFree(dataManaged));
