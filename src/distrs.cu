@@ -171,27 +171,10 @@ DTYPE inverse_gamma_cdf(DTYPE x, DTYPE shape, DTYPE scale) {
 }
 
 __host__ __device__ void dirichlet(DTYPE *dst, DTYPE *param, size_t n) {
-#ifdef __CUDA_ARCH__
-
-    int i = threadIdx.x + blockIdx.x * blockDim.x;
-
-    dst[i] = gamma(param[i], 1);
-
-    __threadfence();
-
-    if(i == 0)
-        normalize(dst, n);
-    
-    __threadfence();
-
-#else
-
     for (int i = 0; i < n; i++) {
         dst[i] = gamma(param[i], 1);
     }
     normalize(dst, n);
-
-#endif
 }
 
 DTYPE dirichlet_pdf(DTYPE *x, DTYPE *param, size_t n) {

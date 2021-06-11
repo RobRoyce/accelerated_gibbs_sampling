@@ -69,4 +69,4 @@ void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, DTYPE *dat
 
 void freeGmmGibbsState(struct GmmGibbsState *state);
 
-void gibbs(struct GmmGibbsState *state, size_t iters);
+void gibbs(struct GmmGibbsState *states, int num_states, size_t iters);

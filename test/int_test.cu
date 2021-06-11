@@ -68,11 +68,11 @@ int main(int argc, char **argv) {
     allocGmmGibbsState(&gibbsState, N, K, dataManaged, PRIOR, params);
 
     begin_roi();
-    gibbs(gibbsState, ITERS);
+    gibbs(gibbsState, 1, ITERS);
     end_roi();
 
-//    printParams(params, dataManaged, N, K);
-//    verify(params, h_zs, N);
+    printParams(params, dataManaged, N, K);
+    verify(params, h_zs, N);
 
     freeGmmGibbsState(gibbsState);
     gpuErrchk(cudaFree(dataManaged));
