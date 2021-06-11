@@ -35,8 +35,13 @@ void uniform_cuda(DTYPE *a, DTYPE *b, DTYPE *dest, size_t n) {
     cudaMemcpy(dest, d_data, n * sizeof(DTYPE), cudaMemcpyDeviceToHost);
 }
 
-DTYPE uniform(DTYPE a, DTYPE b) {
+__host__ __device__ DTYPE uniform(DTYPE a, DTYPE b) {
+#ifdef __CUDA_ARCH__
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    return a + curand_uniform(&curandStates[i]) * (b - a);
+#else
     return a + rand() * (b - a) / RAND_MAX;
+#endif
 }
 
 DTYPE uniform_pdf(DTYPE x, DTYPE a, DTYPE b) {
@@ -47,7 +52,7 @@ DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b) {
     return x < a ? 0 : x < b ? (x - a) / (b - a) : 1;
 }
 
-int categorical(DTYPE *param, size_t n) {
+__host__ __device__ int categorical(DTYPE *param, size_t n) {
     DTYPE u = uniform(0, 1), sum = 0;
     int i = 0;
     while (u > sum)
@@ -76,13 +81,21 @@ DTYPE categorical_cdf(int x, DTYPE *param, size_t n) {
 //    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
 //}
 
-DTYPE gaussian(DTYPE mean, DTYPE var) {
+__host__ __device__ DTYPE gaussian(DTYPE mean, DTYPE var) {
     DTYPE u = uniform(0, 1), v = uniform(0, 1);
+#ifdef __CUDA_ARCH__
+    return mean + sqrtf(-2 * logf(u) * var) * cosf(2 * M_PI * v);
+#else
     return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
+#endif
 }
 
-DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
-    return exp(-square(x - mean) / 2 / var) / sqrt(2 * M_PI * var);
+__host__ __device__ DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
+#ifdef __CUDA_ARCH__
+    return expf(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
+#else
+    return exp(-(square(x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
+#endif
 }
 
 DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {
@@ -90,7 +103,30 @@ DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {
 }
 
 //Wikipedia algorithm
-DTYPE gamma(DTYPE shape, DTYPE rate) {
+__host__ __device__ DTYPE gamma(DTYPE shape, DTYPE rate) {
+#ifdef __CUDA_ARCH__
+
+    int n = floorf(shape);
+    DTYPE delta = shape - n, exp_part = 0, xi, eta;
+
+    while (n--)
+        exp_part += -logf(uniform(0, 1));
+
+    if (delta > DBL_EPSILON) {
+        do {
+            if (uniform(0, 1) < M_E / (M_E + delta)) {
+                xi = powf(uniform(0, 1), 1 / delta);
+                eta = uniform(0, 1) * powf(xi, delta - 1);
+            } else {
+                xi = 1 - logf(uniform(0, 1));
+                eta = uniform(0, 1) * expf(-xi);
+            }
+        } while (eta > powf(xi, delta - 1) * expf(-xi));
+    }
+    return (xi + exp_part) / rate;
+
+#else
+
     int n = floor(shape);
     DTYPE delta = shape - n, exp_part = 0, xi, eta;
 
@@ -109,6 +145,9 @@ DTYPE gamma(DTYPE shape, DTYPE rate) {
         } while (eta > pow(xi, delta - 1) * exp(-xi));
     }
     return (xi + exp_part) / rate;
+
+#endif
+
 }
 
 DTYPE gamma_pdf(DTYPE x, DTYPE shape, DTYPE rate) {
@@ -119,7 +158,7 @@ DTYPE gamma_cdf(DTYPE x, DTYPE shape, DTYPE rate) {
     return x <= 0 ? 0 : ligamma(shape, rate * x) / tgamma(shape);
 }
 
-DTYPE inverse_gamma(DTYPE shape, DTYPE scale) {
+__host__ __device__ DTYPE inverse_gamma(DTYPE shape, DTYPE scale) {
     return 1 / gamma(shape, scale);
 }
 
@@ -131,11 +170,28 @@ DTYPE inverse_gamma_cdf(DTYPE x, DTYPE shape, DTYPE scale) {
     return x <= 0 ? 0 : 1 - ligamma(shape, scale / x) / tgamma(shape);
 }
 
-void dirichlet(DTYPE *dst, DTYPE *param, size_t n) {
+__host__ __device__ void dirichlet(DTYPE *dst, DTYPE *param, size_t n) {
+#ifdef __CUDA_ARCH__
+
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+
+    dst[i] = gamma(param[i], 1);
+
+    __threadfence();
+
+    if(i == 0)
+        normalize(dst, n);
+    
+    __threadfence();
+
+#else
+
     for (int i = 0; i < n; i++) {
         dst[i] = gamma(param[i], 1);
     }
     normalize(dst, n);
+
+#endif
 }
 
 DTYPE dirichlet_pdf(DTYPE *x, DTYPE *param, size_t n) {

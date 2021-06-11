@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cuda.h>
 #include <curand_kernel.h>
 #include <curand.h>
@@ -14,3 +16,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
         if (abort) exit(code);
     }
 }
+
+// cuRAND state array for uniform distributions
+extern __device__ curandState curandStates[];
+
+extern __global__ void setup_kernel();

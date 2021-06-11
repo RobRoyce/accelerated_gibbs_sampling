@@ -1,5 +1,5 @@
 CC=nvcc
-CFLAGS=-lm -lcurand
+CFLAGS=-lm -lcudadevrt -lcurand -g -arch=sm_60 -rdc=true
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test
 MODULES := distrs utils gmm gmm_gibbs
@@ -12,16 +12,16 @@ init:
 	mkdir -p obj bin
 
 distrs: src/distrs.cu src/distrs.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+	$(CC) -c $(CFLAGS) $< -o obj/$@.o -dlink
 
 utils: src/utils.cu src/utils.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+	$(CC) -c $(CFLAGS) $< -o obj/$@.o -dlink
 
 gmm: src/gmm.cu src/gmm.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+	$(CC) -c $(CFLAGS) $< -o obj/$@.o -dlink
 
 gmm_gibbs: src/gmm_gibbs.cu src/gmm.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+	$(CC) -c $(CFLAGS) $< -o obj/$@.o -dlink
 
 cont_pdf_test: test/cont_pdf_test.cu
 	$(CC) $(CFLAGS) obj/* $^ -o bin/$@

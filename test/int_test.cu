@@ -23,9 +23,16 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
 
 void verify(struct GMMParams *params, unsigned *zs, size_t n);
 
+#ifndef NSAMPLES
+    #define NSAMPLES (1024)
+#endif
+#ifndef KCLASSES
+    #define KCLASSES (4)
+#endif
+
 int DEBUG = 1;
-const int N = 8192 << 2;
-const int K = 64;
+const int N = NSAMPLES;
+const int K = KCLASSES;
 const int ITERS = 500;
 
 const struct GMMPrior PRIOR = {
