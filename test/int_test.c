@@ -1,5 +1,17 @@
 #include "../src/gmm.h"
 
+#ifndef NSAMPLES
+#define NSAMPLES (1024)
+#endif
+#ifndef KCLASSES
+#define KCLASSES (4)
+#endif
+
+int DEBUG = 1;
+const int N = NSAMPLES;
+const int K = KCLASSES;
+const int ITERS = 500;
+
 static uint64_t usec;
 static __inline__ uint64_t gettime(void) {
     struct timeval tv;
@@ -9,7 +21,7 @@ static __inline__ uint64_t gettime(void) {
 __attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
 __attribute__ ((noinline))  void end_roi() {
     usec = (gettime() - usec);
-    printf("elapsed (sec): %f\n", usec / 1000000.0);
+    printf("%d,%d,%lu\n", N, K, usec);
 }
 
 void printParams(struct gmm_params *params, DTYPE *data, size_t n, size_t k);
@@ -17,11 +29,6 @@ void printParams(struct gmm_params *params, DTYPE *data, size_t n, size_t k);
 void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
 
 void verify(struct gmm_params *params, unsigned *zs, size_t n);
-
-int DEBUG = 1;
-const int N = 8192 << 3;
-const int K = 32;
-const int ITERS = 500;
 
 const struct gmm_prior PRIOR = {
         .dirichlet_prior=5.0f,
@@ -37,21 +44,21 @@ int main(int argc, char **argv) {
 
     const unsigned DATA_MEM_SIZE = N * sizeof(DTYPE);
     unsigned int zs[N];
-    DTYPE weights[K], means[K], vars[K], *dataManaged = malloc(DATA_MEM_SIZE);
+    DTYPE weights[K], means[K], vars[K], *dataManaged = malloc(DATA_MEM_SIZE);;
     struct gmm_gibbs_state *gibbs_state;
     struct gmm_params params = {.weights=weights, .means=means, .vars=vars, .zs=zs};
 
     randomInit(dataManaged, zs, N, K);
     rand_init_gmm_params(&params, N, K, PRIOR);
     gibbs_state = alloc_gmm_gibbs_state(N, K, dataManaged, PRIOR, &params);
-    printParams(&params, dataManaged, N, K);
+//    printParams(&params, dataManaged, N, K);
 
     begin_roi();
     gibbs(gibbs_state, ITERS);
     end_roi();
 
     free_gmm_gibbs_state(gibbs_state);
-    printParams(&params, dataManaged, N, K);
+//    printParams(&params, dataManaged, N, K);
 
     return 0;
 }
