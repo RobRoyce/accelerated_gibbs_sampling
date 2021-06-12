@@ -1,4 +1,4 @@
-echo "N,K,Time(usec)" > test/results.csv
+echo "N,K,Time(usec),Accuracy" > test/results.csv
 ./bin/int_test-1 >> test/results.csv
 ./bin/int_test-2 >> test/results.csv
 ./bin/int_test-3 >> test/results.csv

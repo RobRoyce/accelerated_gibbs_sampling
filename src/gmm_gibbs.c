@@ -28,7 +28,7 @@ struct gmm_gibbs_state {
 struct gmm_gibbs_state *
 alloc_gmm_gibbs_state(size_t n, size_t k, DTYPE *data, struct gmm_prior prior,
                       struct gmm_params *params) {
-    struct gmm_gibbs_state *s = abortMalloc(sizeof(struct gmm_gibbs_state));
+    struct gmm_gibbs_state *s = (struct gmm_gibbs_state *)abortMalloc(sizeof(struct gmm_gibbs_state));
     s->n = n;
     s->k = k;
     s->data = data;
