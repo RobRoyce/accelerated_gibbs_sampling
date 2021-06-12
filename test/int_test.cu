@@ -6,10 +6,10 @@
 #include "../src/gmm.h"
 
 #ifndef NSAMPLES
-    #define NSAMPLES 1024
+    #define NSAMPLES (1024)
 #endif
 #ifndef KCLASSES
-    #define KCLASSES 32
+    #define KCLASSES (4)
 #endif
 
 int DEBUG = 1;
@@ -29,12 +29,6 @@ __attribute__ ((noinline))  void end_roi() {
     printf("%d,%d,%lu\n", N, K, usec);
 }
 
-void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
-
-void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
-
-void verify(struct GMMParams *params, unsigned *zs, size_t n);
-
 const struct GMMPrior PRIOR = {
         .dirichletPrior=5.0,
         .meansMeanPrior=0.0,
@@ -42,6 +36,12 @@ const struct GMMPrior PRIOR = {
         .varsShapePrior=2.0,
         .varsScalePrior=10.0
 };
+
+void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
+
+void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
+
+void verify(struct GMMParams *params, unsigned *zs, size_t n);
 
 int main(int argc, char **argv) {
     DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
