@@ -100,7 +100,6 @@ void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k) {
 }
 
 void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
-    std::vector <std::normal_distribution<DTYPE>> distrs(k);
     std::vector <std::vector<DTYPE>> samples;
     const int N_SAMPLES = 256;
     int means[k], stds[k];
