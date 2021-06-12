@@ -184,11 +184,9 @@ void gibbs(struct GmmGibbsState *gibbsStates, int num_states, size_t iters) {
     {
         // Initialize CUDA random states
         setup_kernel<<<num_states, 1>>>();
-        gpuErrchk(cudaDeviceSynchronize());
 
         // Run independent Gibbs samplers
         gibbsCuda<<<num_states, 1>>>(gibbsStates, iters);
-        gpuErrchk(cudaDeviceSynchronize());
     }
     else
     {

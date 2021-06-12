@@ -75,12 +75,6 @@ DTYPE categorical_cdf(int x, DTYPE *param, size_t n) {
     return res;
 }
 
-//__global__
-//void gaussian_cuda(DTYPE mean, DTYPE var, DTYPE *dest, size_t n) {
-//    DTYPE u = uniform(0, 1), v = uniform(0, 1);
-//    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
-//}
-
 __host__ __device__ DTYPE gaussian(DTYPE mean, DTYPE var) {
     DTYPE u = uniform(0, 1), v = uniform(0, 1);
 #ifdef __CUDA_ARCH__

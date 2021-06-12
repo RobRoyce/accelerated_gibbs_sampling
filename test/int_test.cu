@@ -68,8 +68,11 @@ int main(int argc, char **argv) {
     gibbs(gibbsState, M, ITERS);
     end_roi();
 
-    printParams(gibbsState[0].params, gibbsState[0].data, gibbsState[0].n, gibbsState[0].k);
-    verify(gibbsState[0].params, h_zs, N);
+    for(int i = 0; i < M; i++)
+    {
+        printParams(gibbsState[i].params, gibbsState[i].data, gibbsState[i].n, gibbsState[i].k);
+        verify(gibbsState[i].params, h_zs, N);
+    }
 
     freeGmmGibbsState(gibbsState, M);
     gpuErrchk(cudaFree(dataManaged));
