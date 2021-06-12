@@ -142,8 +142,12 @@ __global__ void updateZs(struct GmmGibbsState *state) {
 void gibbs(struct GmmGibbsState *gibbsState, size_t iters) {
     dim3 kThreads(gibbsState->k, 1, 1);
     dim3 kBlocks(1, 1, 1);
-    dim3 nThreads(1024, 1, 1);
-    dim3 nBlocks(gibbsState->n / nThreads.x, 1, 1);
+    
+    int thds = gibbsState->n < 1024 ? gibbsState->n : 1024;
+    dim3 nThreads(thds, 1, 1);
+
+    int blks = thds == 1024 ? gibbsState->n / nThreads.x : 1;
+    dim3 nBlocks(blks, 1, 1);
 
     // Initialize CUDA random states
     setup_kernel<<<nThreads, nBlocks>>>();
