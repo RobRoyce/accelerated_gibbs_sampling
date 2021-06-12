@@ -1,5 +1,5 @@
 CC=nvcc
-CFLAGS=-lm -lcudadevrt -lcurand -rdc=true -g
+CFLAGS=-lm -lcudadevrt -lcurand -rdc=true
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test
 MODULES := distrs utils gmm gmm_gibbs
