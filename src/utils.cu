@@ -26,6 +26,21 @@ __host__ __device__ void normalize(DTYPE *v, size_t n)
         v[i] /= sum;
 }
 
+DTYPE zScore(DTYPE m1, DTYPE m2, DTYPE s1, DTYPE s2)
+{
+    return abs((m1 - m2)/sqrt(s1 + s2));
+}
+
+DTYPE conflateVar(DTYPE var1, DTYPE var2)
+{
+    return (var1*var2)/(var1 + var2);
+}
+
+DTYPE conflateMean(DTYPE m1, DTYPE m2, DTYPE var1, DTYPE var2)
+{
+    return (var2*m1 + var1*m2)/(var1 + var2);
+}
+
 DTYPE square(DTYPE x) { return x*x; }
 
 DTYPE ligamma(DTYPE s, DTYPE x)

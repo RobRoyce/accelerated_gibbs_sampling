@@ -24,13 +24,13 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
 void verify(struct GMMParams *params, unsigned *zs, size_t n);
 
 #ifndef NSAMPLES
-    #define NSAMPLES (1024)
+    #define NSAMPLES (16384)
 #endif
 #ifndef KCLASSES
-    #define KCLASSES (4)
+    #define KCLASSES (16)
 #endif
 #ifndef MSAMPLERS
-    #define MSAMPLERS (4)
+    #define MSAMPLERS (16)
 #endif
 
 int DEBUG = 1;

@@ -9,7 +9,7 @@
     #define NSAMPLES (1024)
 #endif
 #ifndef KCLASSES
-    #define KCLASSES (16)
+    #define KCLASSES (4)
 #endif
 #ifndef MSAMPLERS
     #define MSAMPLERS (4)
@@ -47,12 +47,23 @@ void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, size_t m, 
     // Shuffle the dataset such that each independent sampler gets a decent representation of the problem
     shuffle(data, n);
 
+    const unsigned CLASS_MEM_SIZE = k * sizeof(DTYPE),
+            PARAM_MEM_SIZE = sizeof(struct GMMParams),
+            ZS_MEM_SIZE = n * sizeof(unsigned);
+
+    struct GMMParams *params_init = nullptr;
+
+    gpuErrchk(cudaMallocManaged(&params_init, PARAM_MEM_SIZE));
+    gpuErrchk(cudaMallocManaged(&(params_init->weights), CLASS_MEM_SIZE));
+    gpuErrchk(cudaMallocManaged(&(params_init->means), CLASS_MEM_SIZE));
+    gpuErrchk(cudaMallocManaged(&(params_init->vars), CLASS_MEM_SIZE));
+    gpuErrchk(cudaMallocManaged(&(params_init->zs), ZS_MEM_SIZE));
+
+    randInitGmmParams(params_init, n, k, prior);
+
     struct GmmGibbsState *state;
     for(int i = 0; i < m; i++)
     {    
-        const unsigned CLASS_MEM_SIZE = k * sizeof(DTYPE),
-                PARAM_MEM_SIZE = sizeof(struct GMMParams),
-                ZS_MEM_SIZE = n * sizeof(unsigned);
         struct GMMParams *params = nullptr;
 
         gpuErrchk(cudaMallocManaged(&params, PARAM_MEM_SIZE));
@@ -61,14 +72,17 @@ void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, size_t m, 
         gpuErrchk(cudaMallocManaged(&(params->vars), CLASS_MEM_SIZE));
         gpuErrchk(cudaMallocManaged(&(params->zs), ZS_MEM_SIZE));
 
+        gpuErrchk(cudaMemcpy(params->weights, params_init->weights, CLASS_MEM_SIZE, cudaMemcpyDefault));
+        gpuErrchk(cudaMemcpy(params->means, params_init->means, CLASS_MEM_SIZE, cudaMemcpyDefault));
+        gpuErrchk(cudaMemcpy(params->vars, params_init->vars, CLASS_MEM_SIZE, cudaMemcpyDefault));
+        gpuErrchk(cudaMemcpy(params->zs, params_init->zs, ZS_MEM_SIZE, cudaMemcpyDefault));
+
         state = &(*s)[i];
         state->n = n/m;
         state->k = k;
 
         state->data = &data[state->n * i];
         state->prior = prior;
-
-        randInitGmmParams(params, n, k, prior);
 
         state->params = params;
 
@@ -77,7 +91,6 @@ void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, size_t m, 
         gpuErrchk(cudaMallocManaged(&(state->ss->compSums), k * sizeof(DTYPE)));
         gpuErrchk(cudaMallocManaged(&(state->ss->compSquaredSums), k * sizeof(DTYPE)));
 
-        // cudaMemset(state->ss, 0, sizeof(struct GmmSufficientStatistic));
         gpuErrchk(cudaMemset(state->ss->ns, 0, k * sizeof(unsigned int)));
         gpuErrchk(cudaMemset(state->ss->compSums, 0, k * sizeof(DTYPE)));
         gpuErrchk(cudaMemset(state->ss->compSquaredSums, 0, k * sizeof(DTYPE)));
@@ -92,8 +105,8 @@ void freeGmmGibbsState(struct GmmGibbsState *state, size_t m) {
         gpuErrchk(cudaFree(s->ss->compSums));
         gpuErrchk(cudaFree(s->ss->compSquaredSums));
         gpuErrchk(cudaFree(s->ss));
-        gpuErrchk(cudaFree(s));
     }
+    gpuErrchk(cudaFree(state));
 }
 
 __device__ void clearSufficientStatistic(struct GmmGibbsState *state) {
@@ -198,4 +211,45 @@ void gibbs(struct GmmGibbsState *gibbsStates, int num_states, size_t iters) {
     }
 
     gpuErrchk(cudaDeviceSynchronize());
+
+    // Merge results.
+    GmmGibbsState *result = &gibbsStates[0];
+
+    for(int i = 1; i < num_states; i++)
+    {
+        for(int j = 0; j < result->k; j++)
+        {
+            int min = INT_MAX;
+            int argmin = -1;
+
+            // Find the most similar distribution to the jth mean and variance in result
+            for(int l = 0; l < result->k; l++)
+            {
+                DTYPE score = zScore(result->params->means[j], 
+                                     gibbsStates[i].params->means[l],
+                                     result->params->vars[j],
+                                     gibbsStates[i].params->vars[l]
+                                    );
+                if(score < min)
+                {
+                    min = score;
+                    argmin = l;
+                }
+            }
+
+            // printf("%f:%f, %f:%f | ", result->params->means[j], 
+            //                             gibbsStates[i].params->means[argmin],
+            //                             result->params->vars[j],
+            //                             gibbsStates[i].params->vars[argmin]);
+
+            result->params->means[j] = conflateMean(result->params->means[j], 
+                                                    gibbsStates[i].params->means[argmin],
+                                                    result->params->vars[j],
+                                                    gibbsStates[i].params->vars[argmin]
+                                                );
+            result->params->vars[j] = conflateVar(result->params->vars[j],
+                                                  gibbsStates[i].params->vars[argmin]
+                                                );
+        }
+    }
 }
