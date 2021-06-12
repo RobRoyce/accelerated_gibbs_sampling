@@ -11,9 +11,12 @@
 #ifndef KCLASSES
     #define KCLASSES (16)
 #endif
+#ifndef MSAMPLERS
+    #define MSAMPLERS (4)
+#endif
 
 // cuRAND state array for uniform distributions
-__device__ curandState curandStates[NSAMPLES];
+__device__ curandState curandStates[MSAMPLERS];
 
 __global__ void setup_kernel() {
     int id = threadIdx.x + blockIdx.x * blockDim.x;
@@ -21,35 +24,76 @@ __global__ void setup_kernel() {
     curand_init(1234, id, 0, &(curandStates[id]));
 }
 
-void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, DTYPE *data,
-                        struct GMMPrior prior, struct GMMParams *params) {
-    gpuErrchk(cudaMallocManaged(s, sizeof(struct GmmGibbsState)));
-
-    struct GmmGibbsState *state = *s;
-    state->n = n;
-    state->k = k;
-
-    state->data = data;
-    state->prior = prior;
-    state->params = params;
-
-    gpuErrchk(cudaMallocManaged(&(state->ss), sizeof(struct GmmSufficientStatistic)));
-    gpuErrchk(cudaMallocManaged(&(state->ss->ns), k * sizeof(unsigned int)));
-    gpuErrchk(cudaMallocManaged(&(state->ss->compSums), k * sizeof(DTYPE)));
-    gpuErrchk(cudaMallocManaged(&(state->ss->compSquaredSums), k * sizeof(DTYPE)));
-
-    // cudaMemset(state->ss, 0, sizeof(struct GmmSufficientStatistic));
-    gpuErrchk(cudaMemset(state->ss->ns, 0, k * sizeof(unsigned int)));
-    gpuErrchk(cudaMemset(state->ss->compSums, 0, k * sizeof(DTYPE)));
-    gpuErrchk(cudaMemset(state->ss->compSquaredSums, 0, k * sizeof(DTYPE)));
+inline void swap(DTYPE *data, int i, int j)
+{
+    DTYPE tmp = data[i];
+    data[i] = data[j];
+    data[j] = tmp;
 }
 
-void freeGmmGibbsState(struct GmmGibbsState *state) {
-    gpuErrchk(cudaFree(state->ss->ns));
-    gpuErrchk(cudaFree(state->ss->compSums));
-    gpuErrchk(cudaFree(state->ss->compSquaredSums));
-    gpuErrchk(cudaFree(state->ss));
-    gpuErrchk(cudaFree(state));
+void shuffle(DTYPE *data, int n)
+{
+    for(int i = 0; i < n; i++)
+    {
+        unsigned int swapIdx = (unsigned int)rand() % n;
+        swap(data, i, swapIdx);
+    }
+}
+
+void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, size_t m, DTYPE *data, struct GMMPrior prior) {
+
+    gpuErrchk(cudaMallocManaged(s, m * sizeof(struct GmmGibbsState)));
+
+    // Shuffle the dataset such that each independent sampler gets a decent representation of the problem
+    shuffle(data, n);
+
+    struct GmmGibbsState *state;
+    for(int i = 0; i < m; i++)
+    {    
+        const unsigned CLASS_MEM_SIZE = k * sizeof(DTYPE),
+                PARAM_MEM_SIZE = sizeof(struct GMMParams),
+                ZS_MEM_SIZE = n * sizeof(unsigned);
+        struct GMMParams *params = nullptr;
+
+        gpuErrchk(cudaMallocManaged(&params, PARAM_MEM_SIZE));
+        gpuErrchk(cudaMallocManaged(&(params->weights), CLASS_MEM_SIZE));
+        gpuErrchk(cudaMallocManaged(&(params->means), CLASS_MEM_SIZE));
+        gpuErrchk(cudaMallocManaged(&(params->vars), CLASS_MEM_SIZE));
+        gpuErrchk(cudaMallocManaged(&(params->zs), ZS_MEM_SIZE));
+
+        state = &(*s)[i];
+        state->n = n/m;
+        state->k = k;
+
+        state->data = &data[state->n * i];
+        state->prior = prior;
+
+        randInitGmmParams(params, n, k, prior);
+
+        state->params = params;
+
+        gpuErrchk(cudaMallocManaged(&(state->ss), sizeof(struct GmmSufficientStatistic)));
+        gpuErrchk(cudaMallocManaged(&(state->ss->ns), k * sizeof(unsigned int)));
+        gpuErrchk(cudaMallocManaged(&(state->ss->compSums), k * sizeof(DTYPE)));
+        gpuErrchk(cudaMallocManaged(&(state->ss->compSquaredSums), k * sizeof(DTYPE)));
+
+        // cudaMemset(state->ss, 0, sizeof(struct GmmSufficientStatistic));
+        gpuErrchk(cudaMemset(state->ss->ns, 0, k * sizeof(unsigned int)));
+        gpuErrchk(cudaMemset(state->ss->compSums, 0, k * sizeof(DTYPE)));
+        gpuErrchk(cudaMemset(state->ss->compSquaredSums, 0, k * sizeof(DTYPE)));
+    }
+}
+
+void freeGmmGibbsState(struct GmmGibbsState *state, size_t m) {
+    for (int i=0; i < m; i++)
+    {
+        struct GmmGibbsState *s = &state[i];
+        gpuErrchk(cudaFree(s->ss->ns));
+        gpuErrchk(cudaFree(s->ss->compSums));
+        gpuErrchk(cudaFree(s->ss->compSquaredSums));
+        gpuErrchk(cudaFree(s->ss));
+        gpuErrchk(cudaFree(s));
+    }
 }
 
 __device__ void clearSufficientStatistic(struct GmmGibbsState *state) {
@@ -121,28 +165,39 @@ __device__ void updateZs(struct GmmGibbsState *state) {
 __global__ void gibbsCuda(struct GmmGibbsState *gibbsStates, size_t iters) {
 
     int i = threadIdx.x + blockIdx.x * blockDim.x;
+    struct GmmGibbsState *state = &gibbsStates[i];
 
     while (iters--) {
-        clearSufficientStatistic(&gibbsStates[i]);
-        updateSufficientStatistic(&gibbsStates[i]);
-        updateWeights(&gibbsStates[i]);
-        updateMeans(&gibbsStates[i]);
-        updateVars(&gibbsStates[i]);
-        updateZs(&gibbsStates[i]);
+        clearSufficientStatistic(state);
+        updateSufficientStatistic(state);
+        updateWeights(state);
+        updateMeans(state);
+        updateVars(state);
+        updateZs(state);
     }
-
 
 }
 
 void gibbs(struct GmmGibbsState *gibbsStates, int num_states, size_t iters) {
-    dim3 nThreads(1024, 1, 1);
-    dim3 nBlocks(gibbsStates->n / nThreads.x, 1, 1);
+    
+    if(num_states < 32)
+    {
+        // Initialize CUDA random states
+        setup_kernel<<<num_states, 1>>>();
+        gpuErrchk(cudaDeviceSynchronize());
 
-    // Initialize CUDA random states
-    setup_kernel<<<1024, (gibbsStates->n * num_states) / 1024>>>();
+        // Run independent Gibbs samplers
+        gibbsCuda<<<num_states, 1>>>(gibbsStates, iters);
+        gpuErrchk(cudaDeviceSynchronize());
+    }
+    else
+    {
+        // Initialize CUDA random states
+        setup_kernel<<<32, num_states/32>>>();
 
-    // Run independent Gibbs samplers
-    // gibbsCuda<<<32, num_states/32>>>(gibbsStates, iters);
-    gibbsCuda<<<1, 1>>>(gibbsStates, iters);
+        // Run independent Gibbs samplers
+        gibbsCuda<<<32, num_states/32>>>(gibbsStates, iters);
+    }
+
     gpuErrchk(cudaDeviceSynchronize());
 }

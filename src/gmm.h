@@ -63,10 +63,8 @@ struct GmmGibbsState {
 void randInitGmmParams(struct GMMParams *params, size_t n, size_t k,
                        struct GMMPrior prior);
 
-void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, DTYPE *data,
-                        struct GMMPrior prior,
-                        struct GMMParams *params);
+void allocGmmGibbsState(struct GmmGibbsState **s, size_t n, size_t k, size_t m, DTYPE *data, struct GMMPrior prior);
 
-void freeGmmGibbsState(struct GmmGibbsState *state);
+void freeGmmGibbsState(struct GmmGibbsState *state, size_t m);
 
 void gibbs(struct GmmGibbsState *states, int num_states, size_t iters);

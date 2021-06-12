@@ -29,10 +29,14 @@ void verify(struct GMMParams *params, unsigned *zs, size_t n);
 #ifndef KCLASSES
     #define KCLASSES (4)
 #endif
+#ifndef MSAMPLERS
+    #define MSAMPLERS (4)
+#endif
 
 int DEBUG = 1;
 const int N = NSAMPLES;
 const int K = KCLASSES;
+const int M = MSAMPLERS; // Total independent Gibbs samplers
 const int ITERS = 500;
 
 const struct GMMPrior PRIOR = {
@@ -47,34 +51,27 @@ int main(int argc, char **argv) {
     DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
     srand(42);
 
-    const unsigned CLASS_MEM_SIZE = K * sizeof(DTYPE),
-            PARAM_MEM_SIZE = sizeof(struct GMMParams),
-            DATA_MEM_SIZE = N * sizeof(DTYPE),
-            ZS_MEM_SIZE = N * sizeof(unsigned);
     unsigned *h_zs = new unsigned[N];
     DTYPE *dataManaged = nullptr;
     struct GmmGibbsState *gibbsState = nullptr;
-    struct GMMParams *params = nullptr;
 
-    gpuErrchk(cudaMallocManaged(&params, PARAM_MEM_SIZE));
-    gpuErrchk(cudaMallocManaged(&(params->weights), CLASS_MEM_SIZE));
-    gpuErrchk(cudaMallocManaged(&(params->means), CLASS_MEM_SIZE));
-    gpuErrchk(cudaMallocManaged(&(params->vars), CLASS_MEM_SIZE));
-    gpuErrchk(cudaMallocManaged(&(params->zs), ZS_MEM_SIZE));
+    const unsigned DATA_MEM_SIZE = N * sizeof(DTYPE);
     gpuErrchk(cudaMallocManaged(&dataManaged, DATA_MEM_SIZE));
 
+    // Synthesize data
     randomInit(dataManaged, h_zs, N, K);
-    randInitGmmParams(params, N, K, PRIOR);
-    allocGmmGibbsState(&gibbsState, N, K, dataManaged, PRIOR, params);
+
+    // Partition dataManaged into M subsets and allocate each subset to a unique GmmGibbsState struct.
+    allocGmmGibbsState(&gibbsState, N, K, M, dataManaged, PRIOR);
 
     begin_roi();
-    gibbs(gibbsState, 1, ITERS);
+    gibbs(gibbsState, M, ITERS);
     end_roi();
 
-    printParams(params, dataManaged, N, K);
-    verify(params, h_zs, N);
+    printParams(gibbsState[0].params, gibbsState[0].data, gibbsState[0].n, gibbsState[0].k);
+    verify(gibbsState[0].params, h_zs, N);
 
-    freeGmmGibbsState(gibbsState);
+    freeGmmGibbsState(gibbsState, M);
     gpuErrchk(cudaFree(dataManaged));
     delete[] h_zs;
     return 0;
