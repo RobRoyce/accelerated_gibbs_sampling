@@ -8,10 +8,10 @@
 #include "../src/gmm.h"
 
 #ifndef NSAMPLES
-#define NSAMPLES (1024)
+    #define NSAMPLES (1024)
 #endif
 #ifndef KCLASSES
-#define KCLASSES (4)
+    #define KCLASSES (4)
 #endif
 
 int DEBUG = 1;
@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
     freeGmmGibbsState(gibbsState);
     gpuErrchk(cudaFree(dataManaged));
     delete[] zsTrue;
+    cudaDeviceReset();
     return 0;
 }
 
@@ -111,7 +112,7 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
         std::normal_distribution <DTYPE> s(0, 4);
         means[i] = m(generator);
         stds[i] = abs(s(generator));
-        printf("means[%d]/vars[%d] = %d/%d\n", i, i, means[i], stds[i] * stds[i]);
+//        printf("means[%d]/vars[%d] = %d/%d\n", i, i, means[i], stds[i] * stds[i]);
     }
 
     // Generate distributions, sample N_SAMPLES points, push to dist set
