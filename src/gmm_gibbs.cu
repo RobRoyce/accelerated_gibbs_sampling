@@ -124,7 +124,7 @@ __global__ void updateVars(struct GmmGibbsState *state) {
 
 __global__ void updateZs(struct GmmGibbsState *state) {
     int i = threadIdx.x + blockIdx.x * blockDim.x;
-    DTYPE weights[4]; //TODO work around fixed array size
+    DTYPE weights[KCLASSES];
     DTYPE mu, sigma2;
 
     DTYPE x = state->data[i];
