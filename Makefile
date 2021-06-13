@@ -1,5 +1,5 @@
-CC=nvcc
-CFLAGS=-lm -lcudadevrt -lcurand -g -arch=sm_60 -rdc=true
+CC=nvcc -g
+CFLAGS=-lm -lcudadevrt -lcurand -rdc=true
 INIT := init
 TESTS := cont_pdf_test cont_gof_test int_test
 MODULES := distrs utils gmm gmm_gibbs
@@ -24,20 +24,20 @@ gmm_gibbs: src/gmm_gibbs.cu src/gmm.h
 	$(CC) -c $(CFLAGS) $< -o obj/$@.o -dlink
 
 cont_pdf_test: test/cont_pdf_test.cu
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
-	./bin/$@
+#	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+#	./bin/$@
 
 cont_gof_test: test/cont_gof_test.cu
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
-	./bin/$@
+#	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
+#	./bin/$@
 
 int_test: test/int_test.cu
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@
-	./bin/$@
+	$(CC) -c $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=4 -DMSAMPLERS=16 src/gmm_gibbs.cu -o obj/gmm_gibbs.o -dlink
+	$(CC) $(CFLAGS) -DNSAMPLES=2048 -DKCLASSES=4 -DMSAMPLERS=16 obj/* $^ -o bin/$@-7
 
 clean:
 	rm -rf bin
 	rm -rf obj
 
 test:
-	cd bin && ./cont_gof_test && ./int_test && ./cont_pdf_test
+	bash test/run_tests.sh

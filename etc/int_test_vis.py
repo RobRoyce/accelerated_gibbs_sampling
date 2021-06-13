@@ -18,10 +18,11 @@ if __name__ == '__main__':
         w, mu, sigma2 = comp_params[j]
         x = np.linspace(mu - 3*sigma2**.5, mu + 3*sigma2**.5, 200)
         comp_pts = data[zs == j]
-        plt.hist(comp_pts, density=True, bins=6, color=cmap(2*j), alpha=0.5)
+        plt.hist(comp_pts, density=True, bins=1, color=cmap(2*j), alpha=0.5)
         plt.plot(x, gaussian_pdf(mu, sigma2)(x), color=cmap(2*j+1))
         plt.plot(comp_pts, 0.1*np.ones_like(comp_pts), '.', color=cmap(2*j+1))
-    plt.show()
+        plt.ylim(0,0.4)
+    plt.savefig('plot.png')
 
 
 

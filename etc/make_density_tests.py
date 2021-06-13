@@ -13,8 +13,7 @@ function of interest at `n` points in a given interval.
  c_fn_name: name of the C function being tested
  args: additional arguments of the C function being tested
 """
-TestParams = namedtuple('TestParams',
-                        'a b n f name c_fn_name args'.split())
+TestParams = namedtuple('TestParams', 'a b n f name c_fn_name args'.split())
 
 test_params_list = [
     TestParams(-1, 2, 100, uniform.pdf, 'uniform(0, 1) pdf',

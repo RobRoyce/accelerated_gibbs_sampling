@@ -2,26 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <iostream>
 #include <time.h>
+#include <vector>
 #include "../src/gmm.h"
-
-static uint64_t usec;
-static __inline__ uint64_t gettime(void) {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (((uint64_t) tv.tv_sec) * 1000000 + ((uint64_t) tv.tv_usec));
-}
-__attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
-__attribute__ ((noinline))  void end_roi() {
-    usec = (gettime() - usec);
-    printf("elapsed (sec): %f\n", usec / 1000000.0);
-}
-
-void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
-
-void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
-
-void verify(struct GMMParams *params, unsigned *zs, size_t n);
 
 #ifndef NSAMPLES
     #define NSAMPLES (16384)
@@ -32,6 +16,18 @@ void verify(struct GMMParams *params, unsigned *zs, size_t n);
 #ifndef MSAMPLERS
     #define MSAMPLERS (16)
 #endif
+
+static uint64_t usec;
+static __inline__ uint64_t gettime(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (((uint64_t) tv.tv_sec) * 1000000 + ((uint64_t) tv.tv_usec));
+}
+__attribute__ ((noinline))  void begin_roi() { usec = gettime(); }
+__attribute__ ((noinline))  void end_roi() {
+    usec = (gettime() - usec);
+    printf("%d,%d,%d,%lu\n", NSAMPLES, KCLASSES, MSAMPLERS, usec);
+}
 
 int DEBUG = 1;
 const int N = NSAMPLES;
@@ -47,9 +43,15 @@ const struct GMMPrior PRIOR = {
         .varsScalePrior=10.0
 };
 
+void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k);
+
+void randomInit(DTYPE *data, unsigned *zs, const int n, const int k);
+
+DTYPE accuracy(struct GMMParams *params, unsigned *zs, size_t n);
+
 int main(int argc, char **argv) {
     DEBUG = (argc > 1) && (strcmp(argv[1], "--debug") == 0) ? 1 : 0;
-    srand(42);
+    srand(69);
 
     unsigned *h_zs = new unsigned[N];
     DTYPE *dataManaged = nullptr;
@@ -66,13 +68,12 @@ int main(int argc, char **argv) {
 
     begin_roi();
     gibbs(gibbsState, M, ITERS);
-    end_roi();
+//    end_roi();
 
-    for(int i = 0; i < M; i++)
-    {
-        printParams(gibbsState[i].params, gibbsState[i].data, gibbsState[i].n, gibbsState[i].k);
-        verify(gibbsState[i].params, h_zs, N);
-    }
+
+    printParams(gibbsState[0].params, gibbsState[0].data, gibbsState[0].n, gibbsState[0].k);
+//        verify(gibbsState[0].params, h_zs, N);
+
 
     freeGmmGibbsState(gibbsState, M);
     gpuErrchk(cudaFree(dataManaged));
@@ -94,42 +95,43 @@ void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k) {
 }
 
 void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
-    unsigned cat = 0;
-    int min = 0, mod = 0;
+    std::default_random_engine generator;
+    std::vector <std::vector<DTYPE>> samples;
+    const int N_SAMPLES = 1024;
+    int means[k], stds[k];
+
+    // Generate arbitrary means and standard deviations
+    for (int i = 0; i < k; i++) {
+        std::normal_distribution <DTYPE> m(0, sqrt(n));
+        std::normal_distribution <DTYPE> s(0, 4);
+        means[i] = m(generator);
+        stds[i] = abs(s(generator));
+//        printf("means[%d]/vars[%d] = %d/%d\n", i, i, means[i], stds[i] * stds[i]);
+    }
+
+    // Generate distributions, sample N_SAMPLES points, push to dist set
+    for (int i = 0; i < k; i++) {
+        std::vector <DTYPE> sample;
+
+        std::normal_distribution <DTYPE> d(means[i], stds[i]);
+        for (int j = 0; j < N_SAMPLES; j++)
+            sample.push_back(d(generator));
+
+        samples.push_back(sample);
+    }
+
+    // Sample from distributions
     for (int i = 0; i < n; i++) {
-        if (i < n / k) {
-            min = 50;
-            mod = 10;
-            cat = 0;
-        } else if (i < 2*n / k) {
-            min = 12;
-            mod = 4;
-            cat = 1;
-        } else if (i < 3*n / k) {
-            min = -20;
-            mod = 3;
-            cat = 2;
-        } else {
-            min = -90;
-            mod = 3;
-            cat = 3;
-        }
-        data[i] = min + (rand() % mod);
-        zs[i] = cat;
+        int idx = rand() % k;
+        data[i] = samples[idx][rand() % N_SAMPLES];
+        zs[i] = idx;
     }
 }
 
-void verify(struct GMMParams *params, unsigned *zs, size_t n) {
-    int err = 0;
-
-    for (int i = 0; i < N; i++) {
-        if (params->zs[i] != zs[i]) {
-            err = 1;
-        }
-    }
-
-    if (err != 0)
-        printf("int_test ---------------------------------------- FAILED! \n");
-    else
-        printf("int_test ---------------------------------------- SUCCESS! \n");
+DTYPE accuracy(struct GMMParams *params, unsigned *zs, size_t n) {
+    DTYPE err = 0.0;
+    for (int i = 0; i < n; i++)
+        if (params->zs[i] != zs[i])
+            err += 1.0;
+    return 1 - (err / n);
 }
