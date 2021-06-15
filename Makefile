@@ -1,6 +1,7 @@
 CC=nvcc
-OPT=-O0
-CFLAGS=--gpu-architecture=sm_75 $(OPT) -lm -lcurand -rdc=true -dlto
+OPT=0
+DLTO=
+CFLAGS=--gpu-architecture=sm_75 -O$(OPT) $(DLTO) -lm -lcurand -rdc=true
 DFLAGS=-DNSAMPLES=$(NSAMPLES) -DKCLASSES=$(KCLASSES)
 OBJ=obj
 BIN=bin
@@ -12,8 +13,8 @@ MODULES := distrs utils gmm gmm_gibbs
 TESTS := cont_pdf_test cont_gof_test int_test
 
 EXEC_FILES := $(shell find $(BIN)/int*)
-NSAMPLES=1024
-KCLASSES=4
+NSAMPLES=262144
+KCLASSES=64
 
 .PHONY : clean test
 all: $(INIT) modules $(TESTS)
@@ -22,7 +23,7 @@ profile: init modules
 	filenum=0
 	for n in 16384 32768 65536 131072 262144 ; do \
 		for k in 2 4 8 16 32 64 128 ; do \
-		  	make int_test NSAMPLES=$$n KCLASSES=$$k OPT=-O1; \
+		  	make int_test NSAMPLES=$$n KCLASSES=$$k OPT=1 DLTO=-dlto; \
 		done \
   	done
 
@@ -32,7 +33,7 @@ exec:
   		./$$file >> $(CSV); \
 	done
 
-debug: CFLAGS += -G
+debug: CFLAGS += -g -G
 debug: all
 
 init:

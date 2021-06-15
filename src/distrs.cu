@@ -4,16 +4,15 @@
 #include <iostream>
 #include <stdio.h>
 #include "gpu.h"
-
-#ifndef M_E
-# define M_E 2.7182818284590452354 /* e */
-#endif
-#ifndef M_PI
-# define M_PI 3.14159265358979323846 /* pi */
-#endif
-
 #include "utils.h"
 #include "distrs.h"
+
+#ifndef M_E
+# define M_E		2.7182818284590452354	/* e */
+#endif
+#ifndef M_PI
+# define M_PI		3.14159265358979323846	/* pi */
+#endif
 
 __global__ void vec_add(DTYPE *a, DTYPE *b, DTYPE *dest, int size, DTYPE *rand, DTYPE rand_max) {
     int i = threadIdx.x;
@@ -78,21 +77,21 @@ DTYPE categorical_cdf(int x, DTYPE *param, size_t n) {
 //__global__
 //void gaussian_cuda(DTYPE mean, DTYPE var, DTYPE *dest, size_t n) {
 //    DTYPE u = uniform(0, 1), v = uniform(0, 1);
-//    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
+//    return mean + sqrt(-2 * log(u) * var) * cos(2 * CUDART_PI_F * v);
 //}
 
 __host__ __device__ DTYPE gaussian(DTYPE mean, DTYPE var) {
     DTYPE u = uniform(0, 1), v = uniform(0, 1);
 #ifdef __CUDA_ARCH__
-    return mean + sqrtf(-2 * logf(u) * var) * cosf(2 * M_PI * v);
+    return mean + sqrtf(-2 * logf(u) * var) * cosf(2 * CUDART_PI_F * v);
 #else
-    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
+    return mean + sqrt(-2 * log(u) * var) * cos(2 * CUDART_PI_F * v);
 #endif
 }
 
 __host__ __device__ DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
 #ifdef __CUDA_ARCH__
-    return expf(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
+    return expf(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * CUDART_PI_F * var);
 #else
     return exp(-(square(x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
 #endif

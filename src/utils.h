@@ -1,7 +1,6 @@
 #pragma once
 
 #include <math.h>
-
 typedef float DTYPE;
 
 // add `u` and `v` of length `k` and store the result in `dst`

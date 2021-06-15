@@ -3,6 +3,7 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 #include <curand.h>
+#include "math_constants.h"
 
 #ifndef NSAMPLES
 #define NSAMPLES (1024)
@@ -10,6 +11,13 @@
 #ifndef KCLASSES
 #define KCLASSES (16)
 #endif
+#ifndef M_E
+# define M_E 2.7182818284590452354 /* e */
+#endif
+#ifndef M_PI
+# define M_PI 3.14159265358979323846 /* pi */
+#endif
+
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 
