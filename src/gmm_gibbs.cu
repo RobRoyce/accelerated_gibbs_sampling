@@ -155,12 +155,16 @@ void gibbs(struct GmmGibbsState *gibbsState, size_t iters) {
 
     while (iters--) {
         clearSufficientStatistic<<<kBlocks, kThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
         updateSufficientStatistic<<<nBlocks, nThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
         updateWeightsCuda<<<kBlocks, kThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
         updateMeans<<<kBlocks, kThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
         updateVars<<<kBlocks, kThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
         updateZs<<<nBlocks, nThreads>>>(gibbsState);
+        gpuErrchk(cudaDeviceSynchronize());
     }
-    
-    gpuErrchk(cudaDeviceSynchronize());
 }

@@ -4,6 +4,13 @@
 #include <curand_kernel.h>
 #include <curand.h>
 
+#ifndef NSAMPLES
+#define NSAMPLES (1024)
+#endif
+#ifndef KCLASSES
+#define KCLASSES (16)
+#endif
+
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 
 #define CUDA_CALL(x) do { if((x) != cudaSuccess) { \
@@ -12,7 +19,7 @@
 
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort = true) {
     if (code != cudaSuccess) {
-        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+        fprintf(stderr, "GPUassert [%d/%d]: %s %s %d\n", NSAMPLES, KCLASSES, cudaGetErrorString(code), file, line);
         if (abort) exit(code);
     }
 }
