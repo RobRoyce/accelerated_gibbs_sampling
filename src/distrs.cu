@@ -54,8 +54,12 @@ DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b) {
 __host__ __device__ int categorical(DTYPE *param, size_t n) {
     DTYPE u = uniform(0, 1), sum = 0;
     int i = 0;
-    while (u > sum)
-        sum += param[i++];
+    for (i = 0; i < n && u > sum; i++) {
+        sum += isnan(param[i]) ? 0 : param[i];
+    }
+
+//    while (u > sum)
+//        sum += param[i++];
     return i - 1;
 }
 
@@ -104,7 +108,6 @@ DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {
 //Wikipedia algorithm
 __host__ __device__ DTYPE gamma(DTYPE shape, DTYPE rate) {
 #ifdef __CUDA_ARCH__
-
     int n = floorf(shape);
     DTYPE delta = shape - n, exp_part = 0, xi, eta;
 

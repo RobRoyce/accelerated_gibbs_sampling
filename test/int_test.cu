@@ -72,6 +72,8 @@ int main(int argc, char **argv) {
     randInitGmmParams(params, N, K, PRIOR);
     allocGmmGibbsState(&gibbsState, N, K, dataManaged, PRIOR, params);
 
+
+
     begin_roi();
     gibbs(gibbsState, ITERS);
     runtime = end_roi();
