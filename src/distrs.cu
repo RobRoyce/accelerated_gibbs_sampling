@@ -53,6 +53,8 @@ DTYPE uniform_cdf(DTYPE x, DTYPE a, DTYPE b) {
 
 __host__ __device__ int categorical(DTYPE *param, size_t n) {
     DTYPE u = uniform(0, 1), sum = 0;
+    if (isnan(u))
+        printf("ERROR -- uniform function returned nan!!\n");
     int i = 0;
     for (i = 0; i < n && u > sum; i++) {
         sum += isnan(param[i]) ? 0 : param[i];
@@ -87,21 +89,27 @@ DTYPE categorical_cdf(int x, DTYPE *param, size_t n) {
 __host__ __device__ DTYPE gaussian(DTYPE mean, DTYPE var) {
     DTYPE u = uniform(0, 1), v = uniform(0, 1);
 #ifdef __CUDA_ARCH__
-    return mean + sqrtf(-2 * logf(u) * var) * cosf(2 * CUDART_PI_F * v);
+    if (isnan(u) || isnan(v))
+        printf("ERROR -- uniform function returned nan!!\n");
+    return mean + sqrtf(-2 * logf(u) * var) * cosf(2 * M_PI * v);
 #else
-    return mean + sqrt(-2 * log(u) * var) * cos(2 * CUDART_PI_F * v);
+    return mean + sqrt(-2 * log(u) * var) * cos(2 * M_PI * v);
 #endif
 }
 
 __host__ __device__ DTYPE gaussian_pdf(DTYPE x, DTYPE mean, DTYPE var) {
 #ifdef __CUDA_ARCH__
-    return expf(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * CUDART_PI_F * var);
+    if (var <= 0)
+        printf("ERROR -- divide by zero!\n");
+    return expf(-((x - mean) * (x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
 #else
     return exp(-(square(x - mean)) / 2 / var) / sqrtf(2 * M_PI * var);
 #endif
 }
 
 DTYPE gaussian_cdf(DTYPE x, DTYPE mean, DTYPE var) {
+    if (var <= 0)
+        printf("ERROR -- divide by zero!\n");
     return (1 + erf((x - mean) / sqrt(2 * var))) / 2;
 }
 
@@ -110,6 +118,9 @@ __host__ __device__ DTYPE gamma(DTYPE shape, DTYPE rate) {
 #ifdef __CUDA_ARCH__
     int n = floorf(shape);
     DTYPE delta = shape - n, exp_part = 0, xi, eta;
+
+    if (shape <= 0 || rate <= 0)
+        printf("ERROR -- divide by zero!\n");
 
     while (n--)
         exp_part += -logf(uniform(0, 1));

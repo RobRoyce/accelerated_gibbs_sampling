@@ -13,11 +13,14 @@
 #ifndef KCLASSES
     #define KCLASSES (4)
 #endif
+#ifndef NITERS
+    #define NITERS (500)
+#endif
 
 int DEBUG = 1;
 const int N = NSAMPLES;
 const int K = KCLASSES;
-const int ITERS = 500;
+const int ITERS = NITERS;
 
 static uint64_t usec;
 
@@ -79,7 +82,7 @@ int main(int argc, char **argv) {
     runtime = end_roi();
 
 
-//    printParams(params, dataManaged, N, K);
+    printParams(params, dataManaged, N, K);
     printf("%d,%d,%lu\n", N, K, runtime);
 
     freeGmmGibbsState(gibbsState);
@@ -94,12 +97,12 @@ void printParams(struct GMMParams *params, DTYPE *data, size_t n, size_t k) {
     for (int i = 0; i < k; i++)
         printf("%f %f %f\n", params->weights[i], params->means[i],
                params->vars[i]);
-    for (int i = 0; i < n; i++)
-        printf("%.2f ", data[i]);
-    putchar('\n');
-    for (int i = 0; i < n; i++)
-        printf("%u ", params->zs[i]);
-    putchar('\n');
+//    for (int i = 0; i < n; i++)
+//        printf("%.2f ", data[i]);
+//    putchar('\n');
+//    for (int i = 0; i < n; i++)
+//        printf("%u ", params->zs[i]);
+//    putchar('\n');
 }
 
 void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
@@ -113,8 +116,11 @@ void randomInit(DTYPE *data, unsigned *zs, const int n, const int k) {
         std::normal_distribution <DTYPE> m(0, sqrt(n));
         std::normal_distribution <DTYPE> s(0, 4);
         means[i] = m(generator);
-        stds[i] = abs(s(generator));
-//        printf("means[%d]/vars[%d] = %d/%d\n", i, i, means[i], stds[i] * stds[i]);
+        do {
+            stds[i] = abs(s(generator));
+        } while(stds[i] == 0);
+
+        printf("means[%d]/vars[%d] = %d/%d\n", i, i, means[i], stds[i] * stds[i]);
     }
 
     // Generate distributions, sample N_SAMPLES points, push to dist set

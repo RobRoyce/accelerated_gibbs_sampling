@@ -4,12 +4,12 @@ DLTO=
 OBJ=obj
 BIN=bin
 TEST=test
-NSAMPLES=262144
-KCLASSES=64
-
+NSAMPLES=131072
+KCLASSES=16
+NITERS=500
 
 CFLAGS=--gpu-architecture=sm_75 -O$(OPT) $(DLTO) -lm -lcurand -rdc=true
-DFLAGS=-DNSAMPLES=$(NSAMPLES) -DKCLASSES=$(KCLASSES)
+DFLAGS=-DNSAMPLES=$(NSAMPLES) -DKCLASSES=$(KCLASSES) -DNITERS=$(NITERS)
 
 
 DEPS=src/distrs.cu src/utils.cu src/gmm.cu src/gmm_gibbs.cu
