@@ -1,38 +1,59 @@
-CC=gcc -pg
-CFLAGS=--std=c99 -Wall -Wpedantic -lm
-INIT := init
-TESTS := cont_pdf_test cont_gof_test int_test 
-MODULES := distrs utils gmm gmm_gibbs
+CC=nvcc
+OPT=-O0
+CFLAGS=--gpu-architecture=sm_75 $(OPT) -lm -lcurand -rdc=true -dlto
+DFLAGS=-DNSAMPLES=$(NSAMPLES) -DKCLASSES=$(KCLASSES)
+OBJ=obj
+BIN=bin
+TEST=test
+CSV=$(TEST)/results.csv
 
-all: $(INIT) $(MODULES) $(TESTS)
+INIT := init
+MODULES := distrs utils gmm gmm_gibbs
+TESTS := cont_pdf_test cont_gof_test int_test
+
+EXEC_FILES := $(shell find $(BIN)/int*)
+NSAMPLES=1024
+KCLASSES=4
+
+.PHONY : clean test
+all: $(INIT) modules $(TESTS)
+
+profile: init modules
+	filenum=0
+	for n in 16384 32768 65536 131072 262144 ; do \
+		for k in 2 4 8 16 32 64 128 ; do \
+		  	make int_test NSAMPLES=$$n KCLASSES=$$k OPT=-O1; \
+		done \
+  	done
+
+exec:
+	echo "N,K,Time(usec)" > $(CSV)
+	for file in $(EXEC_FILES) ; do \
+  		./$$file >> $(CSV); \
+	done
+
+debug: CFLAGS += -G
+debug: all
 
 init:
-	mkdir -p obj bin
+	mkdir -p $(OBJ) $(BIN)
 
-distrs: src/distrs.c src/distrs.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+modules: src/distrs.cu src/utils.cu src/gmm.cu src/gmm_gibbs.cu
+	$(CC) --device-c $(CFLAGS) $(DFLAGS) $^ -odir ./$(OBJ)/
 
-utils: src/utils.c src/utils.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+cont_pdf_test: test/cont_pdf_test.cu
+	$(CC) --link $(CFLAGS) $(DFLAGS) $^ obj/* -o $(BIN)/$@
 
-gmm: src/gmm.c src/gmm.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
+cont_gof_test: test/cont_gof_test.cu
+	$(CC) --link $(CFLAGS) $(DFLAGS) $^ obj/* -o $(BIN)/$@
 
-gmm_gibbs: src/gmm_gibbs.c src/gmm.h
-	$(CC) -c $(CFLAGS) $< -o obj/$@.o
-
-cont_pdf_test: test/cont_pdf_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
-
-cont_gof_test: test/cont_gof_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
-
-int_test: test/int_test.c
-	$(CC) $(CFLAGS) obj/* $^ -o bin/$@ -lm
-	./bin/$@
+int_test: test/int_test.cu
+	$(CC) --device-c $(CFLAGS) $(DFLAGS) src/distrs.cu src/utils.cu src/gmm.cu src/gmm_gibbs.cu -odir ./obj/
+	$(CC) --link $(CFLAGS) $(DFLAGS) $^ obj/* -o $(BIN)/$@-$(NSAMPLES)-$(KCLASSES)
 
 clean:
 	rm -rf bin
 	rm -rf obj
+
+test:
+	cd bin && ./cont_gof_test && ./int_test && ./cont_pdf_test
